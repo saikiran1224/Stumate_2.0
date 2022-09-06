@@ -1,5 +1,6 @@
 package com.kirandroid.stumate20
 
+import android.annotation.SuppressLint
 import android.view.animation.OvershootInterpolator
 import android.window.SplashScreen
 import androidx.compose.animation.core.tween
@@ -7,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
@@ -37,15 +41,20 @@ fun SplashScreen(navController: NavController) {
                 })
         )
         delay(3000L)
-        navController.navigate("home_screen")
+        navController.navigate("login_signup_screen")
     }
 
     // Image
     Box(contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) {
-        Image(painter = painterResource(id = R.drawable.splash_logo),
-            contentDescription = "Logo",
-            modifier = Modifier.scale(scale.value))
-    }
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)) {
 
+        Image(
+            painter = painterResource(id = R.drawable.splash_logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(width = 300.dp, height = 200.dp)
+        )
+
+    }
 }

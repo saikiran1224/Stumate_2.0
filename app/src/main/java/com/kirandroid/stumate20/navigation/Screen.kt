@@ -2,6 +2,7 @@ package com.kirandroid.stumate20.navigation
 
 sealed class Screen(val route: String) {
     object Splash: Screen("splash_screen")
-    object Home: Screen("home_screen")
+    object LoginSignUp: Screen("login_signup_screen")
+    object ContinueWithOtherEmail: Screen("continue_with_other_email")
 
 }

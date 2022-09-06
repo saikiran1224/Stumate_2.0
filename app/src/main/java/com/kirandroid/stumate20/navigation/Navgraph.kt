@@ -18,6 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.SplashScreen
+import com.kirandroid.stumate20.authentication.LoginSignUpActivity
+import com.kirandroid.stumate20.authentication.OtherEmailAuth
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -30,16 +32,15 @@ fun SetupNavGraph(navController: NavHostController) {
             SplashScreen(navController = navController)
         }
 
-        // TODO: Load colors from the ui.Theme
-        
-        composable(route = Screen.Home.route) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center) {
-                Text(text = "Welcome to Stumate 2.0!", color = Color.White)
-            }
+        composable(route = Screen.LoginSignUp.route) {
+            LoginSignUpActivity(navController = navController)
         }
+
+        composable(route = Screen.ContinueWithOtherEmail.route) {
+            OtherEmailAuth(navController = navController)
+        }
+
+
         
     }
     

@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.sp
 import com.kirandroid.stumate20.R
 
 // Set of Material typography styles to start with
-val Typography = Typography(
+/*val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -17,7 +17,10 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
-    /* Other default text styles to override
+
+    // Loading the Cabin Font
+
+    *//* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -32,5 +35,40 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )
-    */
+    *//*
+)*/
+
+val Cabin = FontFamily(
+    Font(R.font.cabin_regular),
+    Font(R.font.cabin_medium, FontWeight.W500),
+    Font(R.font.cabin_bold, FontWeight.Bold)
+)
+
+val Typography = Typography(
+
+    bodySmall = TextStyle(
+        fontFamily = Cabin,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    ),
+
+    bodyMedium = TextStyle(
+        fontFamily = Cabin,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+
+    bodyLarge = TextStyle(
+        fontFamily = Cabin,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp
+    ),
+
+    headlineLarge = TextStyle(
+        fontFamily = Cabin,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    ),
+
+
 )
