@@ -20,6 +20,7 @@ import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.SplashScreen
 import com.kirandroid.stumate20.authentication.LoginSignUpActivity
 import com.kirandroid.stumate20.authentication.OtherEmailAuth
+import com.kirandroid.stumate20.authentication.StudentDetails
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -40,6 +41,9 @@ fun SetupNavGraph(navController: NavHostController) {
             OtherEmailAuth(navController = navController)
         }
 
+        composable(route = Screen.StudentDetails.route) {
+            StudentDetails(navController = navController)
+        }
 
         
     }

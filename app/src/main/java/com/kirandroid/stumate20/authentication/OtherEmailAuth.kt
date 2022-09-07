@@ -25,11 +25,10 @@ fun OtherEmailAuth(navController: NavController) {
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(Color.White)) {
+        .background(MaterialTheme.colorScheme.background)) {
 
         Column(modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)) {
+            .fillMaxSize()) {
 
             // Loading Stumate Logo
             Image(painter = painterResource(id = R.drawable.stumate_logo_sign), contentDescription = "Stumate Logo",
@@ -54,7 +53,11 @@ fun OtherEmailAuth(navController: NavController) {
 
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+
+                // Check whether user has entered email ID or not
+                      navController.navigate("take_student_details")
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(25.dp)
@@ -64,7 +67,8 @@ fun OtherEmailAuth(navController: NavController) {
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 8.dp,
                 disabledElevation = 2.dp
-            )) {
+            ),
+        enabled = true) {
 
             Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
         }
