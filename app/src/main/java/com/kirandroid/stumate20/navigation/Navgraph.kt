@@ -18,8 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.SplashScreen
+import com.kirandroid.stumate20.authentication.EmailAuthentication
 import com.kirandroid.stumate20.authentication.LoginSignUpActivity
-import com.kirandroid.stumate20.authentication.OtherEmailAuth
 import com.kirandroid.stumate20.authentication.StudentDetails
 
 @Composable
@@ -37,8 +37,8 @@ fun SetupNavGraph(navController: NavHostController) {
             LoginSignUpActivity(navController = navController)
         }
 
-        composable(route = Screen.ContinueWithOtherEmail.route) {
-            OtherEmailAuth(navController = navController)
+        composable(route = Screen.EmailAuthentication.route) {
+            EmailAuthentication(navController = navController)
         }
 
         composable(route = Screen.StudentDetails.route) {

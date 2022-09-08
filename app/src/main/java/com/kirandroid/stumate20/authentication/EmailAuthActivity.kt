@@ -2,76 +2,230 @@
 
 package com.kirandroid.stumate20.authentication
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import android.text.Layout
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kirandroid.stumate20.R
+import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.Cabin
+import com.kirandroid.stumate20.ui.theme.dividerDotsColor
+import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 
 @Composable
-fun OtherEmailAuth(navController: NavController) {
+fun EmailAuthentication(navController: NavController) {
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)) {
 
         Column(modifier = Modifier
-            .fillMaxSize()) {
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())) {
 
             // Loading Stumate Logo
-            Image(painter = painterResource(id = R.drawable.stumate_logo_sign), contentDescription = "Stumate Logo",
+            Image(painter = painterResource(id = R.drawable.stumate_text_logo),
+                contentDescription = null,
                 modifier = Modifier
-                    .paddingFromBaseline(35.dp)
-                    .size(width = 250.dp, height = 200.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(width = 130.dp, height = 58.dp)
+                    .padding(top = 15.dp))
+
+            Text(
+                text = "Your's Student's Friendly Platform",
+                fontFamily = Cabin,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.5.sp)
+            )
+
+            Divider(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(top = 10.dp, bottom = 15.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(width = 25.dp, height = 2.dp),)
+
+
+            // Login Text - Big
+            Text(
+                text = "Login",
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontFamily = Cabin, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 25.dp)
+            )
+
+            // New to Stumate Text
+            Text(text = buildAnnotatedString {
+                append("New to Stumate? ")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
+                    append("Sign up for free")
+                }
+            },
+                style = TextStyle(fontFamily = Cabin, fontSize = 17.sp,fontWeight = FontWeight.Normal),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier
+                    .padding(top = 18.dp)
+                    .clickable {
+                        // Navigating to Continue with Other Email Screen
+                        navController.navigate("login_signup_screen")
+                    }
                     .align(Alignment.CenterHorizontally))
 
-            // Load Text Field
-            var text by remember { mutableStateOf(TextFieldValue("")) }
-
-            TextField(modifier = Modifier
-                .padding(start = 20.dp, top = 50.dp, end = 20.dp)
+            // Load Text Field - Email ID
+            var txtEmailID by remember { mutableStateOf(TextFieldValue("")) }
+            OutlinedTextField(modifier = Modifier
+                .padding(start = 25.dp, top = 32.dp, end = 25.dp)
                 .fillMaxWidth(),
-                value = text, 
+                value = txtEmailID,
+                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
+                maxLines = 1,
+                shape = RoundedCornerShape(80.dp),
                 onValueChange = { newText ->
-                text = newText
-            },
-            placeholder = { Text(text = "Enter your Email ID")})
+                    txtEmailID = newText
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = { Text("Enter your Email ID", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLabelColor = textFieldHintColor,
+                    placeholderColor = MaterialTheme.colorScheme.secondary
+                ),
+                placeholder = { Text(text = "Enter your Email ")})
 
-        }
+            // Load Text Field - Password
+            var txtPassword by remember { mutableStateOf(TextFieldValue("")) }
+            var passwordVisible by rememberSaveable { mutableStateOf(false) }
+            OutlinedTextField(modifier = Modifier
+                .padding(start = 25.dp, top = 20.dp, end = 25.dp)
+                .fillMaxWidth(),
+                value = txtPassword,
+                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
+                maxLines = 1,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                shape = RoundedCornerShape(80.dp),
+                onValueChange = { newText ->
+                    txtPassword = newText
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                label = { Text("Enter your Password", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLabelColor = textFieldHintColor,
+                    placeholderColor = MaterialTheme.colorScheme.secondary
+                ),
+                placeholder = { Text(text = "Enter your Password ")},
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    // Please provide localized description for accessibility services
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = {passwordVisible = !passwordVisible}){
+                        Icon(imageVector  = image, description)
+                    }
+                })
 
 
-        Button(
+            // Forget your Password Text
+            Text(
+                text = "Forgot your Password?",
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontFamily = Cabin, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 40.dp, top = 10.dp))
+
+            // Continue Button
+            Button(
             onClick = {
-
                 // Check whether user has entered email ID or not
                       navController.navigate("take_student_details")
             },
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(25.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 25.dp, end = 25.dp, top = 50.dp, bottom = 25.dp)
                 .fillMaxWidth()
                 .size(height = 50.dp, width = 350.dp),
             shape = CircleShape,
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 8.dp,
-                disabledElevation = 2.dp
+                disabledElevation = 0.dp
             ),
-        enabled = true) {
+            enabled = false) {
 
-            Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
-        }
+                Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
+
+            }
+
+            // Loading ---or--
+            Text(text = buildAnnotatedString {
+                append("------------------------------------")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp, fontWeight = FontWeight.Medium)) {
+                    append(" or ")
+                }
+                append("------------------------------------")
+            },
+            fontFamily = Cabin,
+            color = dividerDotsColor,
+            fontSize = 10.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally))
+
+            // Loading Continue with Google Button
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 35.dp, bottom = 10.dp)
+                    .fillMaxWidth()
+                    .size(height = 50.dp, width = 350.dp),
+                shape = CircleShape,
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    disabledElevation = 2.dp
+                )) {
+                Icon(
+                    painter = painterResource(id = R.drawable.google_logo),
+                    modifier = Modifier
+                        .padding(start = 0.dp, end = 0.dp)
+                        .size(width = 28.dp, height = 28.dp),
+                    tint = Color.Unspecified,
+                    contentDescription = "Google logo")
+                Text(text = "    Continue with Google", modifier = Modifier.padding(start = 0.dp), fontFamily = Cabin, fontSize = 18.sp, fontWeight = FontWeight.Medium )
+            }
+
+
 
 
 

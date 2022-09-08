@@ -128,7 +128,7 @@ fun StudentDetails(navController: NavController) {
                           leadingIcon = {
 
                               OutlinedCard(
-                                  border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.primary),
+                                  border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onTertiary),
                                   colors = CardDefaults.cardColors(
                                       containerColor = MaterialTheme.colorScheme.primaryContainer
                                   ),

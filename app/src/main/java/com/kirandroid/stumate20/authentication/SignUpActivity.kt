@@ -3,9 +3,7 @@ package com.kirandroid.stumate20.authentication
 import android.icu.number.Scale
 import android.provider.CalendarContract
 import android.text.Layout
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -19,13 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -44,47 +49,82 @@ fun LoginSignUpActivity(navController: NavController) {
 
     // TODO: In Dark Mode, make sure the images of Books and the Stumate logo should be transparent
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)) {
-        
         Column(modifier = Modifier
-            .fillMaxSize(),
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally) {
 
             // Loading Book Icon - Lottie File
-            val logoAnimationComposition by
+            val composition by
             rememberLottieComposition(spec = LottieCompositionSpec.RawRes(resId = R.raw.girl_with_books_anim))
-            val logoAnimationProgress by
-            animateLottieCompositionAsState(composition = logoAnimationComposition, isPlaying = true)
+            val progress by
+            animateLottieCompositionAsState(composition = composition, isPlaying = true, restartOnPlay = true)
 
             LottieAnimation(
-                modifier = Modifier.paddingFromBaseline(35.dp)
+                modifier = Modifier
+                    .padding(top = 25.dp, bottom = 5.dp)
                     .align(Alignment.CenterHorizontally)
                     .size(width = 450.dp, height = 280.dp),
-                composition = logoAnimationComposition,
-                progress = logoAnimationProgress
+                composition = composition,
+                progress = progress
             )
 
-            /*Image(painter = painterResource(id = R.drawable.book_icon),
-                contentDescription = "book Image",
+            // Stumate Logo
+            Image(painter = painterResource(id = R.drawable.stumate_text_logo),
+                contentDescription = null,
                 modifier = Modifier
-                    .paddingFromBaseline(35.dp)
                     .align(Alignment.CenterHorizontally)
-                    .size(width = 450.dp, height = 280.dp))*/
+                    .size(width = 230.dp, height = 75.dp))
 
-            // Loading Stumate logo
-            Image(painter = painterResource(id = R.drawable.stumate_logo_sign), contentDescription = "Stumate Logo",
+            Text(
+                text = "Your's Student's Friendly Platform",
+                fontFamily = Cabin,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal,
+                style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.5.sp))
+
+            Divider(
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .size(width = 280.dp, height = 200.dp)
-                    .align(Alignment.CenterHorizontally))
+                    .padding(top = 10.dp, bottom = 15.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(width = 40.dp, height = 3.dp),)
 
-            // Loading Button
+            // Loading Continue with Email Button
+            OutlinedButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 17.dp, bottom = 10.dp)
+                    .fillMaxWidth()
+                    .size(height = 50.dp, width = 350.dp),
+                shape = CircleShape,
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    disabledElevation = 2.dp
+                ),
+            border = BorderStroke(1.dp,MaterialTheme.colorScheme.primary),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.background)) {
+
+                Icon(painter = painterResource(id = R.drawable.drafts_icon),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(end = 14.dp)
+                        .size(width = 28.dp, height = 28.dp),
+                    contentDescription = "Gmail")
+
+                Text(text = "Continue with Email",
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.padding(start = 0.dp),
+                    fontFamily = Cabin, fontSize = 18.sp, fontWeight = FontWeight.Medium )
+            }
+
+            // Loading Continue with Google Button
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 13.dp, bottom = 10.dp)
                     .fillMaxWidth()
                     .size(height = 50.dp, width = 350.dp),
                 shape = CircleShape,
@@ -92,28 +132,56 @@ fun LoginSignUpActivity(navController: NavController) {
                 defaultElevation = 8.dp,
                 disabledElevation = 2.dp
             )) {
-
-                Icon(painter = painterResource(id = R.drawable.google_logo), modifier = Modifier.size(width = 25.dp, height = 25.dp), contentDescription = "Gmail")
-
-                Text(text = "Continue with Google", modifier = Modifier.padding(start = 15.dp), fontFamily = Cabin, fontSize = 18.sp, )
+                Icon(
+                    painter = painterResource(id = R.drawable.google_logo),
+                    modifier = Modifier
+                        .padding(start = 0.dp, end = 0.dp)
+                        .size(width = 28.dp, height = 28.dp),
+                    tint = Color.Unspecified,
+                    contentDescription = "Google logo")
+                Text(text = "    Continue with Google", modifier = Modifier.padding(start = 0.dp), fontFamily = Cabin, fontSize = 18.sp, fontWeight = FontWeight.Medium )
             }
-        }
 
-        // Continue with other Email Text
+            // Loading "Login Text"
+            Text(text = buildAnnotatedString {
+                append("Already have an account?")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                    append(" Login")
+                }
+            },
+            style = TextStyle(fontFamily = Cabin, fontSize = 17.sp,fontWeight = FontWeight.Medium),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .clickable {
+                        // Navigating to Continue with Other Email Screen
+                        navController.navigate("continue_with_other_email")
+                    })
+
+
+        // Terms and Conditions and Privacy Policy Text
         Text(
-            text = "Continue with other Email",
+            text = buildAnnotatedString {
+                                        append("By continuing, you agree to Stumate's ")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
+                    append("Terms and Conditions")
+                }
+                append(" and ")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
+                    append("Privacy Policy",)
+                }
+            },
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 45.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 30.dp, bottom = 35.dp, end = 30.dp, top = 32.dp)
                 .clickable {
-                    // Navigating to Continue with Other Email Screen
-                    navController.navigate("continue_with_other_email")
+                    // TODO
                 },
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.secondaryContainer,
             fontFamily = Cabin,
-            fontSize = 19.sp,
-            fontWeight = FontWeight.Medium,
-            textDecoration = TextDecoration.Underline
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            style = TextStyle(textAlign = TextAlign.Center)
         )
 
 
