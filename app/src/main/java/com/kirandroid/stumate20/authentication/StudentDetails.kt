@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -80,28 +82,21 @@ fun StudentDetails(navController: NavController) {
                        fontWeight = FontWeight.W500,
                        textAlign = TextAlign.Center)
 
-                  OutlinedCard(
-                      modifier = Modifier
-                          .padding(start = 20.dp, end = 20.dp, top = 15.dp)
-                          .fillMaxSize()
-                          .background(MaterialTheme.colorScheme.background),
-                  border = BorderStroke(width = 0.5.dp, color = MaterialTheme.colorScheme.secondary),
-                  colors = CardDefaults.cardColors(
-                      containerColor = MaterialTheme.colorScheme.background
-                  )) {
 
                       // Load Text Field - Name
                       var txtName by remember { mutableStateOf(TextFieldValue("")) }
                       OutlinedTextField(modifier = Modifier
-                          .padding(start = 15.dp, top = 15.dp, end = 15.dp)
+                          .padding(start = 18.dp, top = 25.dp, end = 18.dp)
                           .fillMaxWidth(),
                           value = txtName,
+                          textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
                           maxLines = 1,
+                          shape = RoundedCornerShape(80.dp),
                           onValueChange = { newText ->
                               txtName = newText
                           },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                          label = { Text("Enter your Full Name")},
+                          label = { Text("Name of Student", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
                           colors = TextFieldDefaults.outlinedTextFieldColors(
                               focusedBorderColor = MaterialTheme.colorScheme.primary,
                               unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
@@ -113,66 +108,60 @@ fun StudentDetails(navController: NavController) {
                       // Load Text Field -  Phone Number
                       var txtPhone by remember { mutableStateOf(TextFieldValue("")) }
                       OutlinedTextField(modifier = Modifier
-                          .padding(start = 15.dp, top = 15.dp, end = 15.dp)
+                          .padding(start = 18.dp, top = 12.dp, end = 18.dp)
                           .fillMaxWidth(),
                           value = txtPhone,
                           maxLines = 1,
+                          textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
+                          shape = RoundedCornerShape(80.dp),
                           onValueChange = { newText ->
                               txtPhone = newText
                           },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                          label = { Text("Enter your Phone Number")},
+
                           colors = TextFieldDefaults.outlinedTextFieldColors(
                               focusedBorderColor = MaterialTheme.colorScheme.primary,
                               unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
                               placeholderColor = MaterialTheme.colorScheme.secondary,
                               unfocusedLabelColor = textFieldHintColor,
                           ),
-                          placeholder = { Text(text = "Enter your Phone Number")})
+                          leadingIcon = {
+
+                              OutlinedCard(
+                                  border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.primary),
+                                  colors = CardDefaults.cardColors(
+                                      containerColor = MaterialTheme.colorScheme.primaryContainer
+                                  ),
+                                  modifier = Modifier.padding(start = 10.dp, end = 8.dp, top = 0.dp, bottom = 0.dp),
+                                  shape = RoundedCornerShape(80.dp),
+                              ) {
+                                  Text(text = "   + 91   ", fontSize = 15.sp,
+                                      color = MaterialTheme.colorScheme.primary,
+                                      fontFamily = Cabin, fontWeight = FontWeight.Bold,
+                                      modifier = Modifier.padding(start = 10.dp, end = 15.dp, top = 5.dp, bottom = 5.dp),
+                                  textAlign = TextAlign.Center)
+                              }
+
+                          },
+                          label = { Text("Phone Number", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
+                          placeholder = { Text(text = "Enter Phone No")})
 
 
                       // Admitted Batch - Drop down
-                      val batchesList = listOf("2019 - 2023", "2020 - 2024", "2021 - 2025", "2022 - 2026")
-                      SpinnerWidget(list = batchesList, label = "Choose your Batch")
+                      val batchesList = listOf("Select your Batch","2019 - 2023", "2020 - 2024", "2021 - 2025", "2022 - 2026")
+                      SpinnerWidget(list = batchesList, label = "Academic Batch")
 
                       // College Name - Drop Down
-                      val collegeNames = listOf("GMR Institute of Technology")
-                      SpinnerWidget(list = collegeNames, label = "Choose College Name")
+                      val collegeNames = listOf("Select College","GMR Institute of Technology")
+                      SpinnerWidget(list = collegeNames, label = "College Name")
 
                       // Department Name - Drop Down
-                      val deptNames = listOf("IT", "CSE", "ECE", "EEE", "MECH", "CHEM","CIVIL")
-                      SpinnerWidget(list = deptNames, label = "Choose Department")
+                      val deptNames = listOf("Select Department","IT", "CSE", "ECE", "EEE", "MECH", "CHEM","CIVIL")
+                      SpinnerWidget(list = deptNames, label = "Department")
 
                       // Section - Drop Down
-                      val sectionNames = listOf("A Section", "B Section", "C Section", "Other")
-                      SpinnerWidget(list = sectionNames, label = "Choose Section")
-
-                      // Load Text Field -  Registration Number
-                      var txtJNTUNo by remember { mutableStateOf(TextFieldValue("")) }
-                      OutlinedTextField(modifier = Modifier
-                          .padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 20.dp)
-                          .fillMaxWidth(),
-                          value = txtJNTUNo,
-                          maxLines = 1,
-                          onValueChange = { newText ->
-                              txtJNTUNo = newText
-                          },
-                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                          label = { Text("Enter Registration Number")},
-                          colors = TextFieldDefaults.outlinedTextFieldColors(
-                              focusedBorderColor = MaterialTheme.colorScheme.primary,
-                              unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                              placeholderColor = MaterialTheme.colorScheme.secondary,
-                              unfocusedLabelColor = textFieldHintColor,
-                          ),
-                          placeholder = { Text(text = "Eg. 18341A1224")})
-
-
-
-
-
-
-                  }
+                      val sectionNames = listOf("Select Section","A Section", "B Section", "C Section", "Other")
+                      SpinnerWidget(list = sectionNames, label = "Section")
 
                    Button(
                        onClick = {
@@ -196,21 +185,10 @@ fun StudentDetails(navController: NavController) {
                    }
 
 
+                  }
+
+
                }
-
-
-
-
-           }
-
        }
    )
-
-
-    @Composable
-    fun AdmittedBatch() {
-
-
-    }
-
 }

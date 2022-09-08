@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -28,6 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.ui.theme.Cabin
 
@@ -46,13 +53,26 @@ fun LoginSignUpActivity(navController: NavController) {
             .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // Loading Book Icon
-            Image(painter = painterResource(id = R.drawable.book_icon),
+            // Loading Book Icon - Lottie File
+            val logoAnimationComposition by
+            rememberLottieComposition(spec = LottieCompositionSpec.RawRes(resId = R.raw.girl_with_books_anim))
+            val logoAnimationProgress by
+            animateLottieCompositionAsState(composition = logoAnimationComposition, isPlaying = true)
+
+            LottieAnimation(
+                modifier = Modifier.paddingFromBaseline(35.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(width = 450.dp, height = 280.dp),
+                composition = logoAnimationComposition,
+                progress = logoAnimationProgress
+            )
+
+            /*Image(painter = painterResource(id = R.drawable.book_icon),
                 contentDescription = "book Image",
                 modifier = Modifier
                     .paddingFromBaseline(35.dp)
                     .align(Alignment.CenterHorizontally)
-                    .size(width = 450.dp, height = 280.dp))
+                    .size(width = 450.dp, height = 280.dp))*/
 
             // Loading Stumate logo
             Image(painter = painterResource(id = R.drawable.stumate_logo_sign), contentDescription = "Stumate Logo",

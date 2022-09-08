@@ -25,7 +25,7 @@ val secondary80 = Color(0xFFDADADA)*/
 
 val md_theme_light_primary = Color(0xFF6750A4)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-val md_theme_light_primaryContainer = Color(0xFFE9DDFF)
+val md_theme_light_primaryContainer = Color(0xFFd0bcff)
 val md_theme_light_onPrimaryContainer = Color(0xFF22005D)
 val md_theme_light_secondary = Color(0xa6c3c3c3)
 val md_theme_light_onSecondary = Color(0xFFFFFFFF)

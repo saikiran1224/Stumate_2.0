@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -17,6 +18,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,21 +29,25 @@ import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 fun SpinnerWidget(list: List<String>, label: String) {
 
 
-   /*var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("") }
+   var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(list[0])}
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = expanded.not() },
-        modifier = Modifier.focusRequester(focusRequester).padding(start = 15.dp, top = 15.dp, end = 15.dp).fillMaxWidth()
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier
+            .padding(start = 18.dp, top = 17.dp, end = 18.dp)
+            .fillMaxWidth()
     ) {
         OutlinedTextField(
             value = selectedOptionText,
             readOnly = true,
+            textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
             singleLine = true,
-            modifier = Modifier.focusRequester(focusRequester).fillMaxWidth(),
+            shape = RoundedCornerShape(80.dp),
+            modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             onValueChange = { selectedOptionText = it },
             label = { Text(text = label) },
@@ -63,7 +69,6 @@ fun SpinnerWidget(list: List<String>, label: String) {
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false
-                    focusManager.clearFocus()
                 },
             ) {
                 list.forEach { selectionOption ->
@@ -71,16 +76,15 @@ fun SpinnerWidget(list: List<String>, label: String) {
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false
-                            focusManager.clearFocus()
                         },
                         text = { Text(text = selectionOption, fontSize = 16.sp, fontFamily = Cabin, fontWeight = FontWeight.Normal) })
 
                 }
             }
 
-    } */
+    }
 
-    var expanded by remember { mutableStateOf(false) }
+    /*var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(list[0]) }
     val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.ArrowDropDown
     val focusManager = LocalFocusManager.current
@@ -124,7 +128,7 @@ fun SpinnerWidget(list: List<String>, label: String) {
                 })
             }
         }
-    }
+    }*/
 
 
 }
