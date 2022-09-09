@@ -3,6 +3,9 @@ package com.kirandroid.stumate20.authentication
 import android.icu.number.Scale
 import android.provider.CalendarContract
 import android.text.Layout
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,8 +19,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -38,19 +43,49 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.Cabin
+import com.kirandroid.stumate20.utils.LoadingState
+import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 
 
 @Composable
-fun LoginSignUpActivity(navController: NavController) {
+fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel) {
 
     // TODO: In Dark Mode, make sure the images of Books and the Stumate logo should be transparent
 
     // Creating a variable for detecting whether its Email or Google Auth
     var authType by remember {
         mutableStateOf("")
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val state by viewModel.loadingState.collectAsState()
+
+    // Equivalent of onActivityResult
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+            viewModel.signWithCredential(credential)
+        } catch (e: ApiException) {
+            Log.w("TAG", "Google sign in failed", e)
+        }
+    }
+
+    // To check the status whether user has successfully autheticated with Google
+    if (state.status == LoadingState.Status.SUCCESS) {
+        // once authenticated successfully
+        // Since user clicked on Email we are changing the authType variable to Email
+        authType = "Google"
+        // Navigating to form page - Enabling Email ID and Password Composable
+        navController.navigate("take_student_details/$authType")
     }
 
         Column(modifier = Modifier
@@ -129,13 +164,22 @@ fun LoginSignUpActivity(navController: NavController) {
                     fontFamily = Cabin, fontSize = 18.sp, fontWeight = FontWeight.Medium )
             }
 
+
+            val context = LocalContext.current
+            val token = stringResource(R.string.default_web_client_id)
+
             // Loading Continue with Google Button
             Button(
                 onClick = {
-                    // Since user clicked on Email we are changing the authType variable to Email
-                    authType = "Google"
-                    // Navigating to form page - Enabling Email ID and Password Composable
-                    navController.navigate("take_student_details/$authType")
+
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(token)
+                        .requestEmail()
+                        .build()
+
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                    launcher.launch(googleSignInClient.signInIntent)
+
                 },
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 13.dp, bottom = 10.dp)

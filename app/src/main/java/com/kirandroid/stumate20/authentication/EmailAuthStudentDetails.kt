@@ -2,7 +2,10 @@
 
 package com.kirandroid.stumate20.authentication
 
+import android.content.Context
+import android.util.Log
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -42,9 +46,22 @@ import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.SpinnerWidget
 import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
+import com.kirandroid.stumate20.utils.LoadingState
+import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 
 @Composable
-fun StudentDetails(navController: NavController, authType: String?) {
+fun StudentDetails(navController: NavController, authType: String?, viewModel: SignUpScreenViewModel) {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val state by viewModel.loadingState.collectAsState()
+
+    // To check the status whether user has successfully authenticated with EMail
+    if (state.status == LoadingState.Status.SUCCESS) {
+        // once authenticated successfully
+        // TODO: Need to send the data to Cloud Firestore then need to send to Choose Avatar Screen
+        navController.navigate("choose_avatar")
+    }
+
 
    Scaffold(
        modifier = Modifier
@@ -62,6 +79,8 @@ fun StudentDetails(navController: NavController, authType: String?) {
                         }
                     },
                 )
+
+
        },
 
        content = { innerPadding ->
@@ -88,7 +107,6 @@ fun StudentDetails(navController: NavController, authType: String?) {
                        textAlign = TextAlign.Center)
 
 
-
                       // Load Text Field - Name
                       var txtName by remember { mutableStateOf(TextFieldValue("")) }
                       OutlinedTextField(modifier = Modifier
@@ -113,7 +131,13 @@ fun StudentDetails(navController: NavController, authType: String?) {
 
 
                       // TODO: Check the condition based on display Email ID and Password
-                      if (authType == "Email") DisplayEmailIDAndPassword()
+                   var emailID by rememberSaveable { mutableStateOf("") }
+
+                   var password by rememberSaveable { mutableStateOf("") }
+
+                      if (authType == "Email")
+                          DisplayEmailIDAndPassword(emailID = emailID, onEmailChange = { emailID = it},
+                          password = password, onPasswordChange = { password = it})
 
                       // Load Text Field -  Phone Number
                       var txtPhone by remember { mutableStateOf(TextFieldValue("")) }
@@ -176,8 +200,15 @@ fun StudentDetails(navController: NavController, authType: String?) {
                    Button(
                        onClick = {
 
-                           // Check whether user has entered email ID or not
-                           navController.navigate("take_student_details")
+                                 // TODO: Check the type of authType variable based on that perform the signUp process and
+                                 // TODO: sending data to Cloud Firestore
+
+
+                          // showToast(msg = "$emailID and $password")
+                                     Log.d("DEBUG", "$emailID and $password")
+                                     // Need to use the viewModel to perform the Sign Up Process
+                                     viewModel.createUserWithEmailAndPassword(email = emailID, password = password)
+
                        },
                        modifier = Modifier
                            .align(Alignment.CenterHorizontally)
@@ -188,7 +219,7 @@ fun StudentDetails(navController: NavController, authType: String?) {
                        elevation = ButtonDefaults.buttonElevation(
                            defaultElevation = 8.dp,
                            disabledElevation = 2.dp
-                       ),
+                       ), // TODO: Enable the button after doing appropriate validation
                        enabled = true) {
 
                        Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
@@ -204,20 +235,25 @@ fun StudentDetails(navController: NavController, authType: String?) {
 }
 
 @Composable
-fun DisplayEmailIDAndPassword() {
+fun showToast(msg: String) {
+
+    Toast.makeText(LocalContext.current, ""+msg, Toast.LENGTH_LONG).show()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DisplayEmailIDAndPassword(emailID: String, onEmailChange: (String) -> Unit, password: String, onPasswordChange: (String) -> Unit) {
 
     // Load Text Field - Email ID
-    var txtEmailID by remember { mutableStateOf(TextFieldValue("")) }
+
     OutlinedTextField(modifier = Modifier
         .padding(start = 18.dp, top = 12.dp, end = 18.dp)
         .fillMaxWidth(),
-        value = txtEmailID,
+        value = emailID,
         textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
         maxLines = 1,
         shape = RoundedCornerShape(80.dp),
-        onValueChange = { newText ->
-            txtEmailID = newText
-        },
+        onValueChange = onEmailChange,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         label = { Text("Enter your Email ID", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -229,20 +265,19 @@ fun DisplayEmailIDAndPassword() {
         ),
         placeholder = { Text(text = "Enter your Email ")})
 
+
     // Load Text Field - Password
-    var txtPassword by remember { mutableStateOf(TextFieldValue("")) }
+
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(modifier = Modifier
         .padding(start = 18.dp, top = 12.dp, end = 18.dp)
         .fillMaxWidth(),
-        value = txtPassword,
+        value = password,
         textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
         maxLines = 1,
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         shape = RoundedCornerShape(80.dp),
-        onValueChange = { newText ->
-            txtPassword = newText
-        },
+        onValueChange = onPasswordChange,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         label = { Text("Enter your Password", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -264,6 +299,4 @@ fun DisplayEmailIDAndPassword() {
                 Icon(imageVector  = image, description)
             }
         })
-
-
 }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "346556430586",
+    "project_id": "stumate2-82786",
+    "storage_bucket": "stumate2-82786.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346556430586:android:983a45e6dd4d376d783143",
+        "android_client_info": {
+          "package_name": "com.kirandroid.stumate20"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "346556430586-sih57a5uahfeki0hmdbjdg0io4qb6plq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcByXLdemMRPnhO2kypR2FBG5KpHjIAQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "346556430586-sih57a5uahfeki0hmdbjdg0io4qb6plq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

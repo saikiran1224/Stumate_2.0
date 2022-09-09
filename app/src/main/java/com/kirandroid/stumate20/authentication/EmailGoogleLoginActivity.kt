@@ -40,10 +40,12 @@ import com.kirandroid.stumate20.ui.theme.dividerDotsColor
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 
 @Composable
-fun EmailAuthentication(navController: NavController) {
+fun LoginScreen(navController: NavController) {
 
 
-        Column(modifier = Modifier
+    //val state by viewModel.loadingState.collectAsState()
+
+    Column(modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())) {
@@ -183,7 +185,7 @@ fun EmailAuthentication(navController: NavController) {
                 defaultElevation = 8.dp,
                 disabledElevation = 0.dp
             ),
-            enabled = false) {
+            enabled = txtEmailID.text.isNotEmpty() && txtPassword.text.isNotEmpty()) {
 
                 Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
 
