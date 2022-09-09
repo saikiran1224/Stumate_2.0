@@ -9,9 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -41,6 +39,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.kirandroid.stumate20.R
+import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.Cabin
 
 
@@ -48,6 +47,11 @@ import com.kirandroid.stumate20.ui.theme.Cabin
 fun LoginSignUpActivity(navController: NavController) {
 
     // TODO: In Dark Mode, make sure the images of Books and the Stumate logo should be transparent
+
+    // Creating a variable for detecting whether its Email or Google Auth
+    var authType by remember {
+        mutableStateOf("")
+    }
 
         Column(modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -59,7 +63,7 @@ fun LoginSignUpActivity(navController: NavController) {
             val composition by
             rememberLottieComposition(spec = LottieCompositionSpec.RawRes(resId = R.raw.girl_with_books_anim))
             val progress by
-            animateLottieCompositionAsState(composition = composition, isPlaying = true, restartOnPlay = true)
+            animateLottieCompositionAsState(composition = composition, isPlaying = true)
 
             LottieAnimation(
                 modifier = Modifier
@@ -94,7 +98,12 @@ fun LoginSignUpActivity(navController: NavController) {
 
             // Loading Continue with Email Button
             OutlinedButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    // Since user clicked on Email we are changing the authType variable to Email
+                    authType = "Email"
+                    // Navigating to form page - Enabling Email ID and Password Composable
+                    navController.navigate("take_student_details/$authType")
+                },
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 17.dp, bottom = 10.dp)
                     .fillMaxWidth()
@@ -122,7 +131,12 @@ fun LoginSignUpActivity(navController: NavController) {
 
             // Loading Continue with Google Button
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    // Since user clicked on Email we are changing the authType variable to Email
+                    authType = "Google"
+                    // Navigating to form page - Enabling Email ID and Password Composable
+                    navController.navigate("take_student_details/$authType")
+                },
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 13.dp, bottom = 10.dp)
                     .fillMaxWidth()

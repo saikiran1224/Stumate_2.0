@@ -15,8 +15,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +30,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -39,7 +44,7 @@ import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 
 @Composable
-fun StudentDetails(navController: NavController) {
+fun StudentDetails(navController: NavController, authType: String?) {
 
    Scaffold(
        modifier = Modifier
@@ -73,7 +78,7 @@ fun StudentDetails(navController: NavController) {
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                             append("Hey! ")
                         }
-                       append("We need more info about your class")},
+                       append("We need more info about you")},
                        modifier = Modifier
                            .padding(start = 15.dp, top = 15.dp, end = 15.dp)
                            .align(Alignment.CenterHorizontally),
@@ -81,6 +86,7 @@ fun StudentDetails(navController: NavController) {
                        fontSize = 22.sp,
                        fontWeight = FontWeight.W500,
                        textAlign = TextAlign.Center)
+
 
 
                       // Load Text Field - Name
@@ -104,6 +110,10 @@ fun StudentDetails(navController: NavController) {
                               placeholderColor = MaterialTheme.colorScheme.secondary
                           ),
                           placeholder = { Text(text = "Enter your Name")})
+
+
+                      // TODO: Check the condition based on display Email ID and Password
+                      if (authType == "Email") DisplayEmailIDAndPassword()
 
                       // Load Text Field -  Phone Number
                       var txtPhone by remember { mutableStateOf(TextFieldValue("")) }
@@ -191,4 +201,69 @@ fun StudentDetails(navController: NavController) {
                }
        }
    )
+}
+
+@Composable
+fun DisplayEmailIDAndPassword() {
+
+    // Load Text Field - Email ID
+    var txtEmailID by remember { mutableStateOf(TextFieldValue("")) }
+    OutlinedTextField(modifier = Modifier
+        .padding(start = 18.dp, top = 12.dp, end = 18.dp)
+        .fillMaxWidth(),
+        value = txtEmailID,
+        textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
+        maxLines = 1,
+        shape = RoundedCornerShape(80.dp),
+        onValueChange = { newText ->
+            txtEmailID = newText
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        label = { Text("Enter your Email ID", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                placeholderColor = MaterialTheme.colorScheme.secondary,
+                unfocusedLabelColor = textFieldHintColor,
+
+        ),
+        placeholder = { Text(text = "Enter your Email ")})
+
+    // Load Text Field - Password
+    var txtPassword by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    OutlinedTextField(modifier = Modifier
+        .padding(start = 18.dp, top = 12.dp, end = 18.dp)
+        .fillMaxWidth(),
+        value = txtPassword,
+        textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp),
+        maxLines = 1,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        shape = RoundedCornerShape(80.dp),
+        onValueChange = { newText ->
+            txtPassword = newText
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        label = { Text("Enter your Password", style = TextStyle(color = textFieldHintColor, fontFamily = Cabin, fontWeight = FontWeight.W300, fontSize = 15.sp))},
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+            placeholderColor = MaterialTheme.colorScheme.secondary,
+            unfocusedLabelColor = textFieldHintColor,
+        ),
+        placeholder = { Text(text = "Enter your Password ")},
+        trailingIcon = {
+            val image = if (passwordVisible)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            // Please provide localized description for accessibility services
+            val description = if (passwordVisible) "Hide password" else "Show password"
+
+            IconButton(onClick = {passwordVisible = !passwordVisible}){
+                Icon(imageVector  = image, description)
+            }
+        })
+
+
 }

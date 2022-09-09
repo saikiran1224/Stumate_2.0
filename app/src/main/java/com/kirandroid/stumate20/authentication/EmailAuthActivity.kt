@@ -171,8 +171,7 @@ fun EmailAuthentication(navController: NavController) {
             // Continue Button
             Button(
             onClick = {
-                // Check whether user has entered email ID or not
-                      navController.navigate("take_student_details")
+              /*TODO*/
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)

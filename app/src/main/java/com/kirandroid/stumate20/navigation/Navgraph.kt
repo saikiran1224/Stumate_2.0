@@ -41,8 +41,12 @@ fun SetupNavGraph(navController: NavHostController) {
             EmailAuthentication(navController = navController)
         }
 
-        composable(route = Screen.StudentDetails.route) {
-            StudentDetails(navController = navController)
+        composable(route = Screen.StudentDetails.route + "/{id}") {
+
+            // Extracting the argument
+            val authType = it.arguments?.getString("id")
+
+            StudentDetails(navController = navController, authType = authType)
         }
 
         
