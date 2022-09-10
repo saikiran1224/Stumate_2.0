@@ -61,17 +61,23 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
 
     // Creating a variable for detecting whether its Email or Google Auth
     var authType by remember {
-        mutableStateOf("")
+        mutableStateOf("null")
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.loadingState.collectAsState()
+
+    var googleEmailID by remember { mutableStateOf("null@gmail.com") }
 
     // Equivalent of onActivityResult
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
         try {
             val account = task.getResult(ApiException::class.java)!!
+
+            // storing the gmail which the user tried to authenticate
+            googleEmailID = account.email.toString()
+
             val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
             viewModel.signWithCredential(credential)
         } catch (e: ApiException) {
@@ -79,13 +85,13 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
         }
     }
 
-    // To check the status whether user has successfully autheticated with Google
+    // To check the status whether user has successfully authenticated with Google
     if (state.status == LoadingState.Status.SUCCESS) {
         // once authenticated successfully
         // Since user clicked on Email we are changing the authType variable to Email
         authType = "Google"
         // Navigating to form page - Enabling Email ID and Password Composable
-        navController.navigate("take_student_details/$authType")
+        navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
     }
 
         Column(modifier = Modifier
@@ -137,7 +143,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     // Since user clicked on Email we are changing the authType variable to Email
                     authType = "Email"
                     // Navigating to form page - Enabling Email ID and Password Composable
-                    navController.navigate("take_student_details/$authType")
+                    navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
                 },
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 17.dp, bottom = 10.dp)

@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class SignUpScreenViewModel: ViewModel() {
+class SignInScreenViewModel: ViewModel() {
 
     val loadingState = MutableStateFlow(LoadingState.IDLE)
 
-    fun createUserWithEmailAndPassword(email: String, password: String) = viewModelScope.launch {
+    fun signInWithEmailAndPassword(email: String, password: String) = viewModelScope.launch {
+
         try {
             loadingState.emit(LoadingState.LOADING)
-            Firebase.auth.createUserWithEmailAndPassword(email, password).await()
+            Firebase.auth.signInWithEmailAndPassword(email, password).await()
             Log.d("DEBUG", "Auth Success")
             loadingState.emit(LoadingState.LOADED)
         } catch (e: Exception) {
@@ -27,10 +28,13 @@ class SignUpScreenViewModel: ViewModel() {
         }
     }
 
+
+
     fun signWithCredential(credential: AuthCredential) = viewModelScope.launch {
         try {
             loadingState.emit(LoadingState.LOADING)
             Firebase.auth.signInWithCredential(credential).await()
+
             loadingState.emit(LoadingState.LOADED)
         } catch (e: Exception) {
             loadingState.emit(LoadingState.error(e.localizedMessage))
