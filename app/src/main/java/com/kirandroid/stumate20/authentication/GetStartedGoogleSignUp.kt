@@ -1,5 +1,6 @@
 package com.kirandroid.stumate20.authentication
 
+import android.annotation.SuppressLint
 import android.icu.number.Scale
 import android.provider.CalendarContract
 import android.text.Layout
@@ -47,13 +48,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.utils.LoadingState
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel) {
 
@@ -64,39 +71,119 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
         mutableStateOf("null")
     }
 
-    val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.loadingState.collectAsState()
+
+    // For Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val token = stringResource(R.string.default_web_client_id)
+
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(token)
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
     var googleEmailID by remember { mutableStateOf("null@gmail.com") }
 
     // Equivalent of onActivityResult
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        Log.d("DEBUG","Enter into launcher function")
         try {
             val account = task.getResult(ApiException::class.java)!!
 
             // storing the gmail which the user tried to authenticate
             googleEmailID = account.email.toString()
 
+            val db = Firebase.firestore
+            db.collection("students_data")
+                .whereEqualTo("emailID", googleEmailID)
+                .get()
+                .addOnSuccessListener {
+                    // checking the size of the result if it's greater than one
+                    // That means user is already registered or registered with some provider
+                    if (it.documents.size == 0) {
+
+                        Log.d("DEBUG", "I am here! ${it.documents.size}")
+                        // New User proceed with Sign in process
+                        val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+                        viewModel.signWithCredential(credential)
+
+                    } else {
+                        Log.d("DEBUG","Found duplicate users")
+                        // If user is already present, we are throwing an exception which tells user to register
+                        // with an different account
+                        googleSignInClient.signOut()
+                        // show Snackbar
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Sorry, this email is already in use with other account!"
+                            )
+                        }
+                    }
+                }
+
+/*
             val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            viewModel.signWithCredential(credential)
+            viewModel.signWithCredential(credential)*/
+
         } catch (e: ApiException) {
             Log.w("TAG", "Google sign in failed", e)
         }
     }
 
-    // To check the status whether user has successfully authenticated with Google
+   /* // To check the status whether user has successfully authenticated with Google
     if (state.status == LoadingState.Status.SUCCESS) {
         // once authenticated successfully
         // Since user clicked on Email we are changing the authType variable to Email
         authType = "Google"
         // Navigating to form page - Enabling Email ID and Password Composable
         navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
+    }*/
+
+    when(state.status) {
+
+        LoadingState.Status.RUNNING -> {
+            // show progress bar
+        }
+
+        LoadingState.Status.SUCCESS -> {
+            // once authenticated successfully
+            // Since user clicked on Email we are changing the authType variable to Email
+            authType = "Google"
+            // Navigating to form page - Enabling Email ID and Password Composable
+            navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
+        }
+
+        LoadingState.Status.FAILED -> {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    "Sorry, some error occurred!"
+                )
+            }
+        }
+
+        else -> {
+            // Nothing
+        }
     }
+
+
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
+    content = {
+        innerPadding ->
 
         Column(modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -154,8 +241,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     defaultElevation = 8.dp,
                     disabledElevation = 2.dp
                 ),
-            border = BorderStroke(1.dp,MaterialTheme.colorScheme.primary),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.background)) {
+                border = BorderStroke(1.dp,MaterialTheme.colorScheme.primary),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.background)) {
 
                 Icon(painter = painterResource(id = R.drawable.drafts_icon),
                     tint = MaterialTheme.colorScheme.primary,
@@ -171,20 +258,17 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
             }
 
 
-            val context = LocalContext.current
-            val token = stringResource(R.string.default_web_client_id)
+
 
             // Loading Continue with Google Button
             Button(
                 onClick = {
 
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
 
-                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
                     launcher.launch(googleSignInClient.signInIntent)
+
+                    // Pasted Code here
+
 
                 },
                 modifier = Modifier
@@ -192,10 +276,10 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     .fillMaxWidth()
                     .size(height = 50.dp, width = 350.dp),
                 shape = CircleShape,
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 8.dp,
-                disabledElevation = 2.dp
-            )) {
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    disabledElevation = 2.dp
+                )) {
                 Icon(
                     painter = painterResource(id = R.drawable.google_logo),
                     modifier = Modifier
@@ -213,8 +297,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     append(" Login")
                 }
             },
-            style = TextStyle(fontFamily = Cabin, fontSize = 17.sp,fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colorScheme.secondaryContainer,
+                style = TextStyle(fontFamily = Cabin, fontSize = 17.sp,fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier
                     .padding(top = 10.dp)
                     .clickable {
@@ -223,33 +307,37 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     })
 
 
-        // Terms and Conditions and Privacy Policy Text
-        Text(
-            text = buildAnnotatedString {
-                                        append("By continuing, you agree to Stumate's ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
-                    append("Terms and Conditions")
-                }
-                append(" and ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
-                    append("Privacy Policy",)
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(start = 30.dp, bottom = 35.dp, end = 30.dp, top = 32.dp)
-                .clickable {
-                    // TODO
+            // Terms and Conditions and Privacy Policy Text
+            Text(
+                text = buildAnnotatedString {
+                    append("By continuing, you agree to Stumate's ")
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
+                        append("Terms and Conditions")
+                    }
+                    append(" and ")
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)) {
+                        append("Privacy Policy",)
+                    }
                 },
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            fontFamily = Cabin,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            style = TextStyle(textAlign = TextAlign.Center)
-        )
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(start = 30.dp, bottom = 35.dp, end = 30.dp, top = 32.dp)
+                    .clickable {
+                        // TODO
+                    },
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                fontFamily = Cabin,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                style = TextStyle(textAlign = TextAlign.Center)
+            )
 
 
-    }
+        }
+
+    })
+
+
    
 
 

@@ -1,6 +1,10 @@
 package com.kirandroid.stumate20.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,10 +13,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kirandroid.stumate20.data.StudentData
+import com.kirandroid.stumate20.exception.DuplicateUserFoundException
 import com.kirandroid.stumate20.utils.LoadingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.lang.RuntimeException
+import java.lang.reflect.InvocationTargetException
 
 /*class SignUpScreenViewModelFactory(private val studentData: StudentData) :
     ViewModelProvider.NewInstanceFactory() {
@@ -28,18 +35,45 @@ class SignUpScreenViewModel(): ViewModel() {
             loadingState.emit(LoadingState.LOADING)
 
             Firebase.auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
-                // Since user got successfully authenticated we will be sending his details to
-                // Cloud Firestore
-                val db = Firebase.firestore
-                // TODO: Try to create a sub collection of Students of College Wise
-                db.collection("students_data").add(studentData).addOnSuccessListener {
-                    Log.d("DEBUG", "Email Authentication and Data Insertion Successful")
-                }
-            }.await()
 
+                // Before registering the user, we need to check whether the user is already registered
+                // with `Gmail` or his data is already there
+                // We will sending the email to db and will be checking for the data
+                val db = Firebase.firestore
+
+                db.collection("students_data")
+                    .whereEqualTo("emailID", email)
+                    .get()
+                    .addOnSuccessListener {
+
+                        // checking the size of the result if it's greater than one
+                        // That means user is already registered or registered with some provider
+                        if(it.documents.size == 0) {
+
+                            // Since it's a fresh user we will be proceeding
+                            // We will be sending his details to Cloud Firestore
+                            // TODO: Try to create a sub collection of Students of College Wise
+                            db.collection("students_data").add(studentData).addOnSuccessListener {
+                                Log.d("DEBUG", "Email Authentication and Data Insertion Successful")
+                            }
+
+                        } else {
+
+                            throw DuplicateUserFoundException("Duplicate EmailAuth User found")
+                            // Showing a snackbar that user is already registered and ask to Login
+                            // navigate him back to Login Page
+                            Log.d("DEBUG", "User is already registered with some other provider")
+
+                        }
+                    }
+
+            }.await()
             loadingState.emit(LoadingState.LOADED)
 
-        } catch (e: Exception) {
+        } catch (duplicate: DuplicateUserFoundException) {
+            loadingState.emit(LoadingState.error(duplicate.localizedMessage))
+        }
+        catch (e: Exception) {
             Log.d("DEBUG", "Auth Fail ${e.localizedMessage!!.toString()}")
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }
@@ -47,12 +81,13 @@ class SignUpScreenViewModel(): ViewModel() {
 
     fun signWithCredential(credential: AuthCredential) = viewModelScope.launch {
         try {
+
             loadingState.emit(LoadingState.LOADING)
             Firebase.auth.signInWithCredential(credential).await()
             loadingState.emit(LoadingState.LOADED)
-        } catch (e: Exception) {
+
+        } catch (e: Throwable) {
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }
     }
-
 }

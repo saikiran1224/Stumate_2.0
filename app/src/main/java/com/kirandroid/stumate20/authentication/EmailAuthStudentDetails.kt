@@ -2,7 +2,7 @@
 
 package com.kirandroid.stumate20.authentication
 
-
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -43,8 +43,9 @@ import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 import com.kirandroid.stumate20.utils.LoadingState
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 import com.kirandroid.stumate20.viewmodels.StudentDetailsViewModel
+import kotlinx.coroutines.launch
 
-
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun StudentDetails(navController: NavController, authType: String?, googleEmailID: String?,
                    viewModel: SignUpScreenViewModel, studentDetailsViewModel: StudentDetailsViewModel) {
@@ -80,10 +81,16 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
         navController.navigate("choose_avatar/${txtName.text}")
     }
 
+
+    // For Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
    Scaffold(
        modifier = Modifier
            .fillMaxSize()
            .background(MaterialTheme.colorScheme.background),
+       snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
        topBar = {
                 CenterAlignedTopAppBar(
                     title = {},
@@ -96,14 +103,41 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                 )
        },
 
+
        content = { innerPadding ->
 
-           // To check the status whether user has successfully authenticated with Email
+          /* // To check the status whether user has successfully authenticated with Email
            if (state.status == LoadingState.Status.SUCCESS) {
 
                // This means that email authentication along with Data insertion is successful
                // Insert the data
                navController.navigate("choose_avatar/${txtName.text}")
+           }*/
+
+
+           when(state.status) {
+
+               LoadingState.Status.RUNNING -> {
+                   // show progress bar
+               }
+
+               LoadingState.Status.SUCCESS -> {
+                   // This means that email authentication along with Data insertion is successful
+                   // Insert the data
+                   navController.navigate("choose_avatar/${txtName.text}")
+               }
+
+               LoadingState.Status.FAILED -> {
+                   coroutineScope.launch {
+                       snackbarHostState.showSnackbar(
+                           "Sorry, this email is already in use with other account!"
+                       )
+                   }
+               }
+
+               else -> {
+                   // Nothing
+               }
            }
 
            Box(modifier = Modifier
