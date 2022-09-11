@@ -71,28 +71,6 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
     var selectedSection by rememberSaveable { mutableStateOf(sectionNames[0])}
 
 
-    // To check the status whether user has successfully authenticated with Email
-    if (state.status == LoadingState.Status.SUCCESS) {
-
-
-
-        // once authenticated successfully we need to extract the values from `OutlinedTextField` and
-        // need to send it to Cloud Firestore
-        val studentData = StudentData(
-            name = txtName.text,
-            emailID = emailID,
-            authType = authType.toString(),
-            phoneNumber = txtPhone.text,
-            academicBatch = selectedBatch,
-            collegeName = selectedCollege,
-            deptName = selectedDepartment,
-            sectionName = selectedSection
-        )
-
-        // passing the Data object to StudentDetailsViewModel for sending Data
-        studentDetailsViewModel.sendStudentDetailsToFirestore(studentData)
-    }
-
     // TO check whether the details are successfully sent to Cloud Firestore
     if(student_viewmodel_state.status == LoadingState.Status.SUCCESS) {
 
@@ -119,6 +97,15 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
        },
 
        content = { innerPadding ->
+
+           // To check the status whether user has successfully authenticated with Email
+           if (state.status == LoadingState.Status.SUCCESS) {
+
+               // This means that email authentication along with Data insertion is successful
+               // Insert the data
+               navController.navigate("choose_avatar/${txtName.text}")
+           }
+
            Box(modifier = Modifier
                .padding(innerPadding)
                .background(MaterialTheme.colorScheme.background)
@@ -351,22 +338,13 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                          // TODO: Check the type of authType variable based on that perform the signUp process and
                          // TODO: sending data to Cloud Firestore
 
-                         Log.d("DEBUG", "$selectedBatch is selected $selectedCollege and $selectedDepartment and $selectedSection")
-                         // Need to use the viewModel to perform the Sign Up Process
+                           // Need to use the viewModel to perform the Sign Up Process
 
-                         if (authType != "Google") {
-                             viewModel.createUserWithEmailAndPassword(
-                                 email = emailID,
-                                 password = password
-                             )
-                         } else {
-                             // directly proceed to send the details to the Firestore
+                         if (authType == "Email") {
 
-                             // once authenticated successfully we need to extract the values from `OutlinedTextField` and
-                             // need to send it to Cloud Firestore
                              val studentData = StudentData(
                                  name = txtName.text,
-                                 emailID = googleEmailID.toString(),
+                                 emailID = emailID,
                                  authType = authType.toString(),
                                  phoneNumber = txtPhone.text,
                                  academicBatch = selectedBatch,
@@ -374,6 +352,18 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                  deptName = selectedDepartment,
                                  sectionName = selectedSection
                              )
+
+                             viewModel.createUserWithEmailAndPassword(email = emailID, password = password, studentData = studentData)
+
+                         } else {
+                             // directly proceed to send the details to the Firestore
+
+                             // once authenticated successfully we need to extract the values from `OutlinedTextField` and
+                             // need to send it to Cloud Firestore
+                             val studentData = StudentData(name = txtName.text, emailID = googleEmailID.toString(),
+                                 authType = authType.toString(), phoneNumber = txtPhone.text,
+                                 academicBatch = selectedBatch, collegeName = selectedCollege,
+                                 deptName = selectedDepartment, sectionName = selectedSection)
 
                              // passing the Data object to StudentDetailsViewModel for sending Data
                              studentDetailsViewModel.sendStudentDetailsToFirestore(studentData)
