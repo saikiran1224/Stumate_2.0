@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class SignInScreenViewModel: ViewModel() {
+class LogInScreenViewModel: ViewModel() {
 
     val loadingState = MutableStateFlow(LoadingState.IDLE)
 
@@ -27,8 +27,6 @@ class SignInScreenViewModel: ViewModel() {
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }
     }
-
-
 
     fun signWithCredential(credential: AuthCredential) = viewModelScope.launch {
         try {

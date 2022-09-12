@@ -83,5 +83,12 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
+    // Image slider - avatars
+   // implementation "com.github.aakarshrestha:compose-pager-snap-helper:0.4.1"
+
+    implementation "dev.chrisbanes.snapper:snapper:0.3.0"
+
+
+
 
 }

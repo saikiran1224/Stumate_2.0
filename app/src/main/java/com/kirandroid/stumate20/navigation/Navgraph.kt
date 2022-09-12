@@ -12,6 +12,8 @@ import com.kirandroid.stumate20.authentication.LoginScreen
 import com.kirandroid.stumate20.authentication.SignUpScreen
 import com.kirandroid.stumate20.authentication.StudentDetails
 import com.kirandroid.stumate20.home.ChooseAvatarScreen
+import com.kirandroid.stumate20.home.DashboardScreen
+import com.kirandroid.stumate20.viewmodels.LogInScreenViewModel
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 import com.kirandroid.stumate20.viewmodels.StudentDetailsViewModel
 
@@ -33,7 +35,9 @@ fun SetupNavGraph(navController: NavHostController) {
         }
 
         composable(route = Screen.LoginScreen.route) {
-            LoginScreen(navController = navController)
+
+            val viewModel:LogInScreenViewModel = LogInScreenViewModel()
+            LoginScreen(navController = navController, viewModel = viewModel)
         }
 
         composable(route = Screen.StudentDetails.route + "?authType={authType}&gmailID={gmailID}", arguments = listOf(
@@ -68,6 +72,12 @@ fun SetupNavGraph(navController: NavHostController) {
             val studentName = it.arguments?.getString("studName")
 
             ChooseAvatarScreen(navController = navController, studentName = studentName)
+        }
+
+        composable(route = Screen.DashboardScreen.route + "/{studName}") {
+
+            val studentName = it.arguments?.getString("studName")
+            DashboardScreen(navController = navController, studentName = studentName.toString())
         }
 
         
