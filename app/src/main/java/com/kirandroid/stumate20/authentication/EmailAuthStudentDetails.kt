@@ -75,10 +75,9 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
     // TO check whether the details are successfully sent to Cloud Firestore
     if(student_viewmodel_state.status == LoadingState.Status.SUCCESS) {
 
-        Log.d("DEBUG", "Called now")
         // sending user to select Avatar
-        // Passing paramter of student Name for the purpose of greeting
-        navController.navigate("choose_avatar/${txtName.text}")
+        // Passing parameter of student Name for the purpose of greeting
+        navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")
     }
 
 
@@ -106,39 +105,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
        content = { innerPadding ->
 
-          /* // To check the status whether user has successfully authenticated with Email
-           if (state.status == LoadingState.Status.SUCCESS) {
 
-               // This means that email authentication along with Data insertion is successful
-               // Insert the data
-               navController.navigate("choose_avatar/${txtName.text}")
-           }*/
-
-
-           when(state.status) {
-
-               LoadingState.Status.RUNNING -> {
-                   // show progress bar
-               }
-
-               LoadingState.Status.SUCCESS -> {
-                   // This means that email authentication along with Data insertion is successful
-                   // Insert the data
-                   navController.navigate("choose_avatar/${txtName.text}")
-               }
-
-               LoadingState.Status.FAILED -> {
-                   coroutineScope.launch {
-                       snackbarHostState.showSnackbar(
-                           "Sorry, this email is already in use with other account!"
-                       )
-                   }
-               }
-
-               else -> {
-                   // Nothing
-               }
-           }
 
            Box(modifier = Modifier
                .padding(innerPadding)
@@ -384,7 +351,8 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                  academicBatch = selectedBatch,
                                  collegeName = selectedCollege,
                                  deptName = selectedDepartment,
-                                 sectionName = selectedSection
+                                 sectionName = selectedSection,
+                                 avatarType = "Not specified",
                              )
 
                              viewModel.createUserWithEmailAndPassword(email = emailID, password = password, studentData = studentData)
@@ -397,7 +365,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                              val studentData = StudentData(name = txtName.text, emailID = googleEmailID.toString(),
                                  authType = authType.toString(), phoneNumber = txtPhone.text,
                                  academicBatch = selectedBatch, collegeName = selectedCollege,
-                                 deptName = selectedDepartment, sectionName = selectedSection)
+                                 deptName = selectedDepartment, sectionName = selectedSection, avatarType = "Not specified")
 
                              // passing the Data object to StudentDetailsViewModel for sending Data
                              studentDetailsViewModel.sendStudentDetailsToFirestore(studentData)
@@ -418,6 +386,32 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
                        Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
                    }
+
+                   when(state.status) {
+
+                       LoadingState.Status.RUNNING -> {
+                           // show progress bar
+                       }
+
+                       LoadingState.Status.SUCCESS -> {
+                           // This means that email authentication along with Data insertion is successful
+                           // Insert the data
+                           navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")
+                       }
+
+                       LoadingState.Status.FAILED -> {
+                           coroutineScope.launch {
+                               snackbarHostState.showSnackbar(
+                                   "Sorry, this email is already in use with other account!"
+                               )
+                           }
+                       }
+
+                       else -> {
+                           // Nothing
+                       }
+                   }
+
                   }
                }
        }

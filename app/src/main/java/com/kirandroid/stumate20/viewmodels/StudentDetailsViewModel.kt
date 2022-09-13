@@ -21,8 +21,10 @@ class StudentDetailsViewModel: ViewModel() {
 
             loadingState.emit(LoadingState.LOADING)
             val db = Firebase.firestore
+            val newStudentData = db.collection("students_data").document()
+            studentData.documentID = newStudentData.id
             // TODO: Try to create a sub collection of Students of College Wise
-            db.collection("students_data").add(studentData).await()
+            newStudentData.set(studentData).await()
             loadingState.emit(LoadingState.LOADED)
 
         } catch (e: Exception) {

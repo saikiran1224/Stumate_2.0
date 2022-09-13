@@ -63,7 +63,7 @@ val md_theme_dark_surfaceTint = Color(0xFFCFBCFF)
 val md_theme_light_lightLightGray = Color(0xa6c3c3c3)
 
 val textFieldHintColor = Color(0xFF5e5e5e)
-
+val unfocusedAvatarColor = Color(0xFF838383)
 
 val seed = Color(0xFF6750A4)
 val primary = Color(0xFF6750A4)

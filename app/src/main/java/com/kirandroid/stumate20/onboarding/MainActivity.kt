@@ -1,4 +1,4 @@
-package com.kirandroid.stumate20
+package com.kirandroid.stumate20.onboarding
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

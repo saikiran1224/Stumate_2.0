@@ -67,11 +67,22 @@ fun SetupNavGraph(navController: NavHostController) {
                 studentDetailsViewModel = studentDetailsViewModel)
         }
 
-        composable(route = Screen.ChooseAvatarScreen.route + "/{studName}") {
+        composable(route = Screen.ChooseAvatarScreen.route + "?stuName={stuName}&stuPhone={phone}", arguments = listOf(
+            navArgument("stuName") {
+                defaultValue = null
+                nullable = true
+                type = NavType.StringType
+            }, navArgument("stuPhone") {
+                defaultValue = null
+                nullable = true
+                type = NavType.StringType
+            }
+        )) {
 
-            val studentName = it.arguments?.getString("studName")
+            val studentName = it.arguments?.getString("stuName")
+            val phone = it.arguments?.getString("phone")
 
-            ChooseAvatarScreen(navController = navController, studentName = studentName)
+            ChooseAvatarScreen(navController = navController, studentName = studentName, phone = phone)
         }
 
         composable(route = Screen.DashboardScreen.route + "/{studName}") {

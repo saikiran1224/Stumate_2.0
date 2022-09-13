@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.kirandroid.stumate20.R
 
-@Composable
+/*@Composable
 internal fun ImageItem(
     text: String,
     modifier: Modifier = Modifier,
@@ -30,7 +30,7 @@ internal fun ImageItem(
             )
         }
     }
-}
+}*/
 
 private val rangeForRandom = (0..100000)
 

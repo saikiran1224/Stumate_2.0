@@ -53,7 +53,9 @@ class SignUpScreenViewModel(): ViewModel() {
                             // Since it's a fresh user we will be proceeding
                             // We will be sending his details to Cloud Firestore
                             // TODO: Try to create a sub collection of Students of College Wise
-                            db.collection("students_data").add(studentData).addOnSuccessListener {
+                            val newStudentData = db.collection("students_data").document()
+                            studentData.documentID = newStudentData.id
+                            newStudentData.set(studentData).addOnSuccessListener {
                                 Log.d("DEBUG", "Email Authentication and Data Insertion Successful")
                             }
 

@@ -230,10 +230,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpScreenViewModel)
                     // Since user clicked on Email we are changing the authType variable to Email
                     authType = "Email"
                     // Navigating to form page - Enabling Email ID and Password Composable
-                   // navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
-
-                    // FOR TIME BEING, FOR DEVELOPMENT OF AVATAR PAGE
-                    navController.navigate("choose_avatar/Saikiran")
+                    navController.navigate("take_student_details?authType=$authType&gmailID=$googleEmailID")
                 },
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 17.dp, bottom = 10.dp)

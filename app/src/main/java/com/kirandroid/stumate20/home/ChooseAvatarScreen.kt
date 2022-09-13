@@ -1,21 +1,28 @@
 package com.kirandroid.stumate20.home
 
-import androidx.compose.foundation.background
+import android.graphics.Paint
+import android.util.Log
+import android.util.Log.d
+import android.widget.Toast
+import android.widget.ToggleButton
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -24,23 +31,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
+import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.data.StudentData
 import com.kirandroid.stumate20.navigation.Screen
-import com.kirandroid.stumate20.ui.theme.Cabin
-import com.kirandroid.stumate20.utils.ImageItem
+import com.kirandroid.stumate20.ui.theme.*
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSnapperApi::class)
 @Composable
-fun ChooseAvatarScreen(navController: NavController, studentName: String?) {
+fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone: String?) {
 
     // For Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
-
 
     Scaffold(
         modifier = Modifier
@@ -60,6 +69,9 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?) {
         },
         content = { innerPadding ->
 
+            val maleCheckedState = remember { mutableStateOf(false) }
+            val femaleCheckedState = remember { mutableStateOf(false) }
+
             Box(modifier = Modifier
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
@@ -69,59 +81,154 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?) {
                     .fillMaxSize() ) {
 
                     // Text - Hi $studentName
-                    Text(text = buildAnnotatedString {
+                    Text(
+                        text = buildAnnotatedString {
 
-                        append("Hi!")
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                            append(" $studentName")
-                        }
-                        append(", Personalize your look")},
+                            append("Hi!")
+                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                                append(" $studentName")
+                            }
+                            append(", Personalize your look")
+                        },
                         modifier = Modifier
                             .padding(start = 15.dp, top = 15.dp, end = 15.dp)
                             .align(Alignment.CenterHorizontally),
                         color = Color.Black,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center)
+                        textAlign = TextAlign.Center
+                    )
 
                     // Text - Choose from fun avatars
-                    Text(text = "Choose from fun avatars",
-                    fontWeight = FontWeight.Thin,
-                    fontFamily = Cabin,
-                    fontSize = 19.sp,
+                    Text(
+                        text = "Choose from fun avatars",
+                        fontWeight = FontWeight.Thin,
+                        fontFamily = Cabin,
+                        fontSize = 19.sp,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 90.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 90.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant
                     )
 
+                    Row(modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 35.dp)
+                        .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        content = {
+                        // Displaying two images
 
-                    LazyRow(
-                        state = lazyListState,
-                        flingBehavior = rememberSnapperFlingBehavior(lazyListState),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        // content
-                        items(5) { index ->
-                            ImageItem(
-                                text = "${index+1}",
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .width(80.dp)
-                            )
-                        }
-                    }
+                            // Male
+                            Column(modifier = Modifier.padding(end = 30.dp), verticalArrangement = Arrangement.Center) {
+                                IconToggleButton(checked = maleCheckedState.value, onCheckedChange = {
+                                    maleCheckedState.value = !maleCheckedState.value
+                                  //  maleBorderColor.value = seed
+
+                                    femaleCheckedState.value = false
+                                   // femaleBorderColor.value = unfocusedAvatarColor
+                                }, modifier = Modifier
+                                    .size(115.dp, 115.dp)
+                                    .clip(CircleShape)
+                                    .border(
+                                        2.dp,
+                                        if (maleCheckedState.value) seed else unfocusedAvatarColor,
+                                        CircleShape
+                                    )
+                                    .padding(5.dp) ) {
+
+                                    Image(painter = painterResource(id = R.drawable.male_avatar),
+                                        contentDescription = null )
+
+                                }
+
+                                Text(text = "Male", color = if (maleCheckedState.value)
+                                    MaterialTheme.colorScheme.primary else unfocusedAvatarColor,
+                                    textAlign = TextAlign.Center, fontWeight = FontWeight.Thin,
+                                    modifier = Modifier
+                                        .padding(top = 10.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                    )
+                            }
 
 
+                            // Female
+                            Column(modifier = Modifier.padding(), verticalArrangement = Arrangement.Center) {
+
+                                IconToggleButton(checked = femaleCheckedState.value, onCheckedChange = {
+                                    femaleCheckedState.value = !femaleCheckedState.value
+                                   // femaleBorderColor.value = seed
+
+                                    maleCheckedState.value = false
+                                   // maleBorderColor.value = unfocusedAvatarColor
+                                }, modifier = Modifier
+                                    .size(115.dp, 115.dp)
+                                    .clip(CircleShape)
+                                    .border(
+                                        2.dp,
+                                        if (femaleCheckedState.value) seed else unfocusedAvatarColor,
+                                        CircleShape
+                                    )
+                                    .padding(5.dp)) {
+
+                                    Image(painter = painterResource(id = R.drawable.female_avatar ), contentDescription = null )
+
+
+                                }
+
+                                Text(text = "Female", modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .align(Alignment.CenterHorizontally),color = if (femaleCheckedState.value)
+                                    MaterialTheme.colorScheme.primary else unfocusedAvatarColor,
+                                    fontWeight = FontWeight.Thin, textAlign = TextAlign.Center )
+                            }
+
+                    })
 
                 }
+
+                // Creating a variable to hold the selected gender
+                var genderSelected by rememberSaveable { mutableStateOf("") }
 
                 // Button - Continue
                 Button(
                     onClick = {
 
-                        /* TODO */
+                        // need to update the firestore record with help of phone Number
+                        // Based on the avatar selected we need to set the gender
+
+                        // Getting the selected gender
+                        genderSelected = if (maleCheckedState.value) "Male" else "Female"
+
+
+                        val db = Firebase.firestore
+                        db.collection("students_data")
+                            .whereEqualTo("phoneNumber", phone)
+                            .get()
+                            .addOnSuccessListener {
+
+                                if(it.documents.size > 0) {
+
+                                    val studentData = it.documents[0].toObject<StudentData>()!!
+
+                                    // Updating the record by taking the key from studentData
+                                    db.collection("students_data").document(studentData.documentID)
+                                        .update("avatarType",genderSelected)
+                                        .addOnSuccessListener {
+
+                                            // Data got updated so navigate him to next Dashboard screen
+                                            navController.navigate("dashboard_screen/${studentName.toString()}")
+
+                                        }.addOnFailureListener {
+                                            Log.d("DEBUG","Some Error Occurred! ${it.localizedMessage}")
+                                            return@addOnFailureListener
+                                        }
+
+                                }
+
+                            }
+
 
                     },
                     modifier = Modifier
@@ -132,9 +239,9 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?) {
                     shape = CircleShape,
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 8.dp,
-                        disabledElevation = 2.dp
+                        disabledElevation = 0.dp
                     ), // TODO: Enable the button after doing appropriate validation
-                    enabled = true) {
+                    enabled = maleCheckedState.value || femaleCheckedState.value) {
 
                     Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
                 }

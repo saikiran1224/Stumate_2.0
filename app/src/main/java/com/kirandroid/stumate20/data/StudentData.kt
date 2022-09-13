@@ -8,5 +8,7 @@ data class StudentData(
     var academicBatch: String = "",
     var collegeName: String = "",
     var deptName: String = "",
-    var sectionName: String = ""
+    var sectionName: String = "",
+    val avatarType: String = "",
+    var documentID: String = ""
 )
