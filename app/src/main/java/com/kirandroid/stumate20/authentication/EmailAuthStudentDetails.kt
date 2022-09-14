@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -41,6 +42,7 @@ import com.kirandroid.stumate20.data.StudentData
 import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 import com.kirandroid.stumate20.utils.LoadingState
+import com.kirandroid.stumate20.utils.UserPreferences
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 import com.kirandroid.stumate20.viewmodels.StudentDetailsViewModel
 import kotlinx.coroutines.launch
@@ -50,7 +52,10 @@ import kotlinx.coroutines.launch
 fun StudentDetails(navController: NavController, authType: String?, googleEmailID: String?,
                    viewModel: SignUpScreenViewModel, studentDetailsViewModel: StudentDetailsViewModel) {
 
+    // For Email Auth
     val state by viewModel.loadingState.collectAsState()
+
+    // For Google Sign in
     val student_viewmodel_state by studentDetailsViewModel.loadingState.collectAsState()
 
     // Lists Data
@@ -72,18 +77,17 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
     var selectedSection by rememberSaveable { mutableStateOf(sectionNames[0])}
 
 
-    // TO check whether the details are successfully sent to Cloud Firestore
-    if(student_viewmodel_state.status == LoadingState.Status.SUCCESS) {
-
-        // sending user to select Avatar
-        // Passing parameter of student Name for the purpose of greeting
-        navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")
-    }
-
-
     // For Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    // Context
+    val context = LocalContext.current
+    // Instantiating User Preferences class
+    val dataStore = UserPreferences(context = context)
+
+    // Creating a sample Student Data object
+    val studentData = StudentData()
 
    Scaffold(
        modifier = Modifier
@@ -104,8 +108,6 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
 
        content = { innerPadding ->
-
-
 
            Box(modifier = Modifier
                .padding(innerPadding)
@@ -343,6 +345,8 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
                          if (authType == "Email") {
 
+                             // EMAIL AUTH
+
                              val studentData = StudentData(
                                  name = txtName.text,
                                  emailID = emailID,
@@ -359,6 +363,8 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
                          } else {
                              // directly proceed to send the details to the Firestore
+
+                             // GOOGLE SIGN-IN
 
                              // once authenticated successfully we need to extract the values from `OutlinedTextField` and
                              // need to send it to Cloud Firestore
@@ -387,6 +393,30 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                        Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
                    }
 
+
+                   // Checking the status of GOOGLE SIGN-IN Data Insertion
+                   // TO check whether the details are successfully sent to Cloud Firestore
+                   if(student_viewmodel_state.status == LoadingState.Status.SUCCESS) {
+
+                       // passing variables to set in the Datastore
+                       val _studentID by remember { mutableStateOf(state.studentID.toString()) }
+                       val _studentEmail by remember { mutableStateOf(state.studentEmailID.toString()) }
+
+                       // Need to set the app preferences
+                       coroutineScope.launch {
+                           dataStore.setIsLogin(true)
+                           dataStore.setStudentID(_studentID)
+                           dataStore.setStudentName(txtName.text.toString())
+                           dataStore.setStudentEmail(_studentEmail)
+                       }
+
+                       // sending user to select Avatar
+                       // Passing parameter of student Name for the purpose of greeting
+                       navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")
+                   }
+
+
+                   // Checking the status of EMAIL AUTH Data Insertion here
                    when(state.status) {
 
                        LoadingState.Status.RUNNING -> {
@@ -394,15 +424,30 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                        }
 
                        LoadingState.Status.SUCCESS -> {
-                           // This means that email authentication along with Data insertion is successful
+                           // This means that "email authentication along with Data insertion" is successful
                            // Insert the data
+
+                           Log.d("DEBUG", "${state.studentID.toString()} and ${state.studentEmailID.toString()} in EmailAuth")
+                           // Setting App Preferences
+
+                           // passing variables to set in the Datastore
+                           val _studentID by remember { mutableStateOf(state.studentID.toString()) }
+                           val _studentEmail by remember { mutableStateOf(state.studentEmailID.toString()) }
+
+                           coroutineScope.launch {
+                               dataStore.setIsLogin(true)
+                               dataStore.setStudentID(_studentID)
+                               dataStore.setStudentName(txtName.text.toString())
+                               dataStore.setStudentEmail(_studentEmail)
+                           }
+
                            navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")
                        }
 
                        LoadingState.Status.FAILED -> {
                            coroutineScope.launch {
                                snackbarHostState.showSnackbar(
-                                   "Sorry, this email is already in use with other account!"
+                                   "Sorry, this email is already in use with other account! ${state.msg}"
                                )
                            }
                        }

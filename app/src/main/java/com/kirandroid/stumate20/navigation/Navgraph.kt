@@ -13,6 +13,7 @@ import com.kirandroid.stumate20.authentication.SignUpScreen
 import com.kirandroid.stumate20.authentication.StudentDetails
 import com.kirandroid.stumate20.home.ChooseAvatarScreen
 import com.kirandroid.stumate20.home.DashboardScreen
+import com.kirandroid.stumate20.viewmodels.ChooseAvatarScreenViewModel
 import com.kirandroid.stumate20.viewmodels.LogInScreenViewModel
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
 import com.kirandroid.stumate20.viewmodels.StudentDetailsViewModel
@@ -82,7 +83,9 @@ fun SetupNavGraph(navController: NavHostController) {
             val studentName = it.arguments?.getString("stuName")
             val phone = it.arguments?.getString("phone")
 
-            ChooseAvatarScreen(navController = navController, studentName = studentName, phone = phone)
+            val chooseAvatarScreenViewModel: ChooseAvatarScreenViewModel = ChooseAvatarScreenViewModel()
+
+            ChooseAvatarScreen(navController = navController, studentName = studentName, phone = phone, viewModel = chooseAvatarScreenViewModel)
         }
 
         composable(route = Screen.DashboardScreen.route + "/{studName}") {

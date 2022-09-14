@@ -77,3 +77,6 @@ val dark_primaryContainer = Color(0xFF4F378A)
 val dark_onprimaryContainer = Color(0xFFE9DDFF)
 
 val dividerDotsColor = Color(0xFF946750a4)
+val dashboardBgColor = Color(0xFFFAFAFA)
+val subjectCardBgColor = Color(0xFFe4F7FF)
+val uploadYourFilesColor = Color(0xFFece5FF)

@@ -53,6 +53,7 @@ import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.ui.theme.dividerDotsColor
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 import com.kirandroid.stumate20.utils.LoadingState
+import com.kirandroid.stumate20.utils.UserPreferences
 import com.kirandroid.stumate20.viewmodels.LogInScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -84,6 +85,9 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
     var googleEmailID by remember { mutableStateOf("null@gmail.com") }
+
+    // Instantiating User Preferences class
+    val dataStore = UserPreferences(context = context)
 
 
     // Equivalent of onActivityResult
@@ -121,11 +125,15 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                             viewModel.signWithCredential(credential)
 
                             // TODO: Set the app preferences with the emailID
-
-                            // TODO: Navigating to dashboard FOR TIME BEING DISABLED UNTIL THE DEVELOPMENT
+                            coroutineScope.launch {
+                                dataStore.setIsLogin(true)
+                                dataStore.setStudentID(studentData.documentID)
+                                dataStore.setStudentName(studentData.name)
+                                dataStore.setStudentEmail(studentData.emailID)
+                            }
 
                             // OF DASHBOARD SCREEN STARTS
-                            navController.navigate("dashboard_screen/${studentData.emailID}")
+                            navController.navigate("dashboard_screen/${studentData.name}")
 
                         } else {
                             googleSignInClient.signOut()
@@ -182,11 +190,15 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                         if (studentData.authType == "Email") {
 
                             // TODO: Set the app preferences with the emailID
-
-                            // TODO: Navigating to dashboard FOR TIME BEING DISABLED UNTIL THE DEVELOPMENT
+                            coroutineScope.launch {
+                                dataStore.setIsLogin(true)
+                                dataStore.setStudentID(studentData.documentID)
+                                dataStore.setStudentName(studentData.name)
+                                dataStore.setStudentEmail(studentData.emailID)
+                            }
 
                             // OF DASHBOARD SCREEN STARTS
-                            navController.navigate("dashboard_screen/${txtEmailID.text.toString()}")
+                            navController.navigate("dashboard_screen/${studentData.name}")
 
                         } else {
 

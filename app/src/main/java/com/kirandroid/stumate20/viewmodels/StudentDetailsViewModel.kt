@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+// For Google Sign in Data Insertion
 class StudentDetailsViewModel: ViewModel() {
 
     val loadingState = MutableStateFlow(LoadingState.IDLE)
@@ -20,12 +21,15 @@ class StudentDetailsViewModel: ViewModel() {
         try {
 
             loadingState.emit(LoadingState.LOADING)
+
             val db = Firebase.firestore
             val newStudentData = db.collection("students_data").document()
             studentData.documentID = newStudentData.id
+
             // TODO: Try to create a sub collection of Students of College Wise
             newStudentData.set(studentData).await()
-            loadingState.emit(LoadingState.LOADED)
+
+            loadingState.emit(LoadingState.success(studentID = newStudentData.id, studentEmailID = studentData.emailID))
 
         } catch (e: Exception) {
 

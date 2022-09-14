@@ -21,7 +21,7 @@ class LogInScreenViewModel: ViewModel() {
             loadingState.emit(LoadingState.LOADING)
             Firebase.auth.signInWithEmailAndPassword(email, password).await()
             Log.d("DEBUG", "Auth Success")
-            loadingState.emit(LoadingState.LOADED)
+            loadingState.emit(LoadingState.success())
         } catch (e: Exception) {
             Log.d("DEBUG", "Auth Fail ${e.localizedMessage!!.toString()}")
             loadingState.emit(LoadingState.error(e.localizedMessage))
@@ -33,7 +33,7 @@ class LogInScreenViewModel: ViewModel() {
             loadingState.emit(LoadingState.LOADING)
             Firebase.auth.signInWithCredential(credential).await()
 
-            loadingState.emit(LoadingState.LOADED)
+            loadingState.emit(LoadingState.success())
         } catch (e: Exception) {
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }

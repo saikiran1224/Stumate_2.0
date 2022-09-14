@@ -1,5 +1,6 @@
 package com.kirandroid.stumate20.home
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.util.Log
 import android.util.Log.d
@@ -38,18 +39,32 @@ import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.data.StudentData
 import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.*
+import com.kirandroid.stumate20.utils.LoadingState
+import com.kirandroid.stumate20.utils.UserPreferences
+import com.kirandroid.stumate20.viewmodels.ChooseAvatarScreenViewModel
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSnapperApi::class)
 @Composable
-fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone: String?) {
+fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone: String?, viewModel: ChooseAvatarScreenViewModel) {
 
     // For Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
+
+    // Storing the state returned from viewmodel
+    val state by viewModel.loadingState.collectAsState()
+
+    //context
+    val context = LocalContext.current
+
+    // we instantiate the saveEmail class
+    val dataStore = UserPreferences(context)
 
     Scaffold(
         modifier = Modifier
@@ -69,6 +84,35 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
         },
         content = { innerPadding ->
 
+            // Handling ViewModel State
+            when(state.status) {
+
+                LoadingState.Status.RUNNING -> {
+                    // show loading progress bar
+                }
+
+                LoadingState.Status.SUCCESS -> {
+
+                    // navigate to the Dashboard Screen
+                    // Data got updated so navigate him to next Dashboard screen
+                    navController.navigate("dashboard_screen/${studentName.toString()}")
+
+                }
+
+                LoadingState.Status.FAILED -> {
+
+                    // Show some error ocurred
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            "Some Error Ocurred!"
+                        )
+                    }
+
+                }
+
+                else -> {}
+            }
+
             val maleCheckedState = remember { mutableStateOf(false) }
             val femaleCheckedState = remember { mutableStateOf(false) }
 
@@ -86,7 +130,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
                             append("Hi!")
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                                append(" $studentName")
+                                append(" ${dataStore.getStudentName.collectAsState("").value}")
                             }
                             append(", Personalize your look")
                         },
@@ -201,8 +245,9 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
                         // Getting the selected gender
                         genderSelected = if (maleCheckedState.value) "Male" else "Female"
 
+                        viewModel.updateAvatarPreference(phone = phone.toString(), genderSelected = genderSelected)
 
-                        val db = Firebase.firestore
+                       /* val db = Firebase.firestore
                         db.collection("students_data")
                             .whereEqualTo("phoneNumber", phone)
                             .get()
@@ -217,8 +262,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
                                         .update("avatarType",genderSelected)
                                         .addOnSuccessListener {
 
-                                            // Data got updated so navigate him to next Dashboard screen
-                                            navController.navigate("dashboard_screen/${studentName.toString()}")
+
 
                                         }.addOnFailureListener {
                                             Log.d("DEBUG","Some Error Occurred! ${it.localizedMessage}")
@@ -227,7 +271,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
                                 }
 
-                            }
+                            }*/
 
 
                     },

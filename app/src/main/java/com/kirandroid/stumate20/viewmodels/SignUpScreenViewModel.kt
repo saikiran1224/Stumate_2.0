@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,7 @@ import java.lang.reflect.InvocationTargetException
     override fun <T : ViewModel> create(modelClass: Class<T>): T = SignUpScreenViewModel(studentData) as T
 }*/
 
+// For Email Auth Data Insertion
 class SignUpScreenViewModel(): ViewModel() {
 
     val loadingState = MutableStateFlow(LoadingState.IDLE)
@@ -33,6 +35,8 @@ class SignUpScreenViewModel(): ViewModel() {
     fun createUserWithEmailAndPassword(email: String, password: String, studentData: StudentData) = viewModelScope.launch {
         try {
             loadingState.emit(LoadingState.LOADING)
+
+            var documentID: String = ""
 
             Firebase.auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
 
@@ -55,7 +59,15 @@ class SignUpScreenViewModel(): ViewModel() {
                             // TODO: Try to create a sub collection of Students of College Wise
                             val newStudentData = db.collection("students_data").document()
                             studentData.documentID = newStudentData.id
+
+                            // Storing the same document ID in the `documentID` variable and sending back to composable
+                            documentID = newStudentData.id
+                            Log.d("DEBUG","In Sign up scren view model $documentID")
+
                             newStudentData.set(studentData).addOnSuccessListener {
+
+                                sendDataToComposable(documentID, email)
+
                                 Log.d("DEBUG", "Email Authentication and Data Insertion Successful")
                             }
 
@@ -70,7 +82,6 @@ class SignUpScreenViewModel(): ViewModel() {
                     }
 
             }.await()
-            loadingState.emit(LoadingState.LOADED)
 
         } catch (duplicate: DuplicateUserFoundException) {
             loadingState.emit(LoadingState.error(duplicate.localizedMessage))
@@ -86,10 +97,17 @@ class SignUpScreenViewModel(): ViewModel() {
 
             loadingState.emit(LoadingState.LOADING)
             Firebase.auth.signInWithCredential(credential).await()
-            loadingState.emit(LoadingState.LOADED)
+            loadingState.emit(LoadingState.success())
 
         } catch (e: Throwable) {
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }
+    }
+
+    private fun sendDataToComposable(documentID: String, email:String) = viewModelScope.launch {
+
+        Log.d("DEBUG","In out of signup screen viewmodel $documentID")
+        loadingState.emit(LoadingState.success(studentID = documentID, studentEmailID = email))
+
     }
 }
