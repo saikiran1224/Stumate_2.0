@@ -80,3 +80,13 @@ val dividerDotsColor = Color(0xFF946750a4)
 val dashboardBgColor = Color(0xFFFAFAFA)
 val subjectCardBgColor = Color(0xFFe4F7FF)
 val uploadYourFilesColor = Color(0xFFece5FF)
+
+val txtSubjectsColor = Color(0xFF4d4d4d)
+val txtStudNameColor = Color(0xFFD0BCFF)
+
+val dashboardTopBgColor = Color(0xFFE0D2FF)
+val txtBrowseYourSubs = Color(0xFFA7a0b8)
+
+val classMatesCardBgColor = Color(0xFFfff7c7)
+val classMatesBottomText = Color(0xFF4d4d4d)
+val classMatesIconColor = Color(0xFFFFe6af)
