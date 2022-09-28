@@ -133,7 +133,7 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                             }
 
                             // OF DASHBOARD SCREEN STARTS
-                            navController.navigate("dashboard_screen/${studentData.name}")
+                            navController.navigate("dashboard_screen")
 
                         } else {
                             googleSignInClient.signOut()
@@ -198,7 +198,7 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                             }
 
                             // OF DASHBOARD SCREEN STARTS
-                            navController.navigate("dashboard_screen/${studentData.name}")
+                            navController.navigate("dashboard_screen")
 
                         } else {
 

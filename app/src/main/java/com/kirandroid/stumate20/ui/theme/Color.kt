@@ -90,3 +90,8 @@ val txtBrowseYourSubs = Color(0xFFA7a0b8)
 val classMatesCardBgColor = Color(0xFFfff7c7)
 val classMatesBottomText = Color(0xFF4d4d4d)
 val classMatesIconColor = Color(0xFFFFe6af)
+
+// Navigation Bar
+val navBarBgColor = Color(0xFFEBE4FF)
+val navContentColor = Color(0xFF555555)
+val navIndicatorColor = Color(0x7CC4BADF)

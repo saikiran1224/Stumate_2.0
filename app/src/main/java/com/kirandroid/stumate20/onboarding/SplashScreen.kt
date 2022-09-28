@@ -62,7 +62,7 @@ fun SplashScreen(navController: NavController) {
         Log.d("DEBUG"," In launched effect, $_isLogin and $studName")
 
         if (_isLogin) {
-            navController.navigate("dashboard_screen/${_studentName.toString()}")
+            navController.navigate("dashboard_screen")
         } else {
             navController.navigate("login_signup_screen")
         }

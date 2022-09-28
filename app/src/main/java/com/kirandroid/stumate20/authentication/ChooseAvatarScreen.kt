@@ -1,14 +1,8 @@
-package com.kirandroid.stumate20.home
+package com.kirandroid.stumate20.screens
 
 import android.annotation.SuppressLint
-import android.graphics.Paint
-import android.util.Log
-import android.util.Log.d
-import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -17,8 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,18 +24,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
 import com.kirandroid.stumate20.R
-import com.kirandroid.stumate20.data.StudentData
-import com.kirandroid.stumate20.navigation.Screen
 import com.kirandroid.stumate20.ui.theme.*
 import com.kirandroid.stumate20.utils.LoadingState
 import com.kirandroid.stumate20.utils.UserPreferences
 import com.kirandroid.stumate20.viewmodels.ChooseAvatarScreenViewModel
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
-import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -95,7 +81,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
                     // navigate to the Dashboard Screen
                     // Data got updated so navigate him to next Dashboard screen
-                    navController.navigate("dashboard_screen/${studentName.toString()}")
+                    navController.navigate("dashboard_screen")
 
                 }
 

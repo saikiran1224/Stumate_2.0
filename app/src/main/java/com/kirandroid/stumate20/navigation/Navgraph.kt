@@ -11,8 +11,7 @@ import com.kirandroid.stumate20.SplashScreen
 import com.kirandroid.stumate20.authentication.LoginScreen
 import com.kirandroid.stumate20.authentication.SignUpScreen
 import com.kirandroid.stumate20.authentication.StudentDetails
-import com.kirandroid.stumate20.home.ChooseAvatarScreen
-import com.kirandroid.stumate20.home.DashboardScreen
+import com.kirandroid.stumate20.screens.*
 import com.kirandroid.stumate20.viewmodels.ChooseAvatarScreenViewModel
 import com.kirandroid.stumate20.viewmodels.LogInScreenViewModel
 import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
@@ -40,6 +39,23 @@ fun SetupNavGraph(navController: NavHostController) {
             val viewModel:LogInScreenViewModel = LogInScreenViewModel()
             LoginScreen(navController = navController, viewModel = viewModel)
         }
+
+        // Class Room Screen
+        composable(route = Screen.ClassRoomScreen.route) {
+            ClassRoomScreen(navController = navController)
+        }
+
+        // Premium Screen
+        composable(route = Screen.PremiumScreen.route) {
+            PremiumScreen(navController = navController)
+        }
+
+        // Profile Screen
+        composable(route = Screen.ProfileScreen.route) {
+            ProfileScreen(navController = navController)
+        }
+
+
 
         composable(route = Screen.StudentDetails.route + "?authType={authType}&gmailID={gmailID}", arguments = listOf(
             navArgument("authType") {
@@ -88,10 +104,12 @@ fun SetupNavGraph(navController: NavHostController) {
             ChooseAvatarScreen(navController = navController, studentName = studentName, phone = phone, viewModel = chooseAvatarScreenViewModel)
         }
 
-        composable(route = Screen.DashboardScreen.route + "/{studName}") {
+        composable(route = Screen.HomeScreen.route) {
 
+            // Used Earlier
             val studentName = it.arguments?.getString("studName")
-            DashboardScreen(navController = navController, studentName = studentName.toString())
+
+            DashboardScreen(navController = navController)
         }
 
         
