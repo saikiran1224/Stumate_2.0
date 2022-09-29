@@ -22,6 +22,7 @@ class UserPreferences(private val context: Context) {
         val STUD_NAME = stringPreferencesKey("stud_name")
         val STUD_ID = stringPreferencesKey("stud_id")
         val STUD_EMAIL_KEY = stringPreferencesKey("stud_email")
+        val STUD_GENDER = stringPreferencesKey("stud_gender")
     }
 
     // Email Getter and Setter
@@ -70,6 +71,18 @@ class UserPreferences(private val context: Context) {
     suspend fun setStudentEmail(studEmailID: String) {
         context.dataStoree.edit { preferences ->
             preferences[STUD_EMAIL_KEY] = studEmailID
+        }
+    }
+
+    // Student Gender Setter and Getter
+    val getStudentGender: Flow<String?> = context.dataStoree.data
+        .map { preferences ->
+            preferences[STUD_GENDER] ?: "Student Gender"
+        }
+
+    suspend fun setStudentGender(studentGender: String) {
+        context.dataStoree.edit { preferences ->
+            preferences[STUD_GENDER] = studentGender
         }
     }
 

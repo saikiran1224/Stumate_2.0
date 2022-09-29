@@ -43,6 +43,10 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
     val lazyListState = rememberLazyListState()
 
+    // Creating a variable to hold the selected gender
+    var genderSelected by rememberSaveable { mutableStateOf("") }
+
+
     // Storing the state returned from viewmodel
     val state by viewModel.loadingState.collectAsState()
 
@@ -78,6 +82,11 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
                 }
 
                 LoadingState.Status.SUCCESS -> {
+
+                    // storing the selected gender in Data store
+                    coroutineScope.launch {
+                        dataStore.setStudentGender(studentGender = genderSelected)
+                    }
 
                     // navigate to the Dashboard Screen
                     // Data got updated so navigate him to next Dashboard screen
@@ -218,8 +227,6 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
                 }
 
-                // Creating a variable to hold the selected gender
-                var genderSelected by rememberSaveable { mutableStateOf("") }
 
                 // Button - Continue
                 Button(
@@ -232,6 +239,8 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
                         genderSelected = if (maleCheckedState.value) "Male" else "Female"
 
                         viewModel.updateAvatarPreference(phone = phone.toString(), genderSelected = genderSelected)
+
+                        // setting
 
                        /* val db = Firebase.firestore
                         db.collection("students_data")

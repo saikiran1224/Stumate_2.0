@@ -281,7 +281,7 @@ fun DashboardScreen(navController: NavController) {
                     // Your Community
                     Text(text = "Your Community", fontSize = 22.sp,
                         color = txtSubjectsColor,
-                        fontWeight = FontWeight.W500,
+                        fontWeight = FontWeight.W700,
                         modifier = Modifier.padding(top = 25.dp, start = 16.dp))
 
 
