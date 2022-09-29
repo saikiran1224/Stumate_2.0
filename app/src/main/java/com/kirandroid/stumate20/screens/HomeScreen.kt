@@ -1,6 +1,7 @@
 package com.kirandroid.stumate20.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,8 @@ import androidx.navigation.NavController
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.ui.theme.*
 import com.kirandroid.stumate20.utils.BottomNavigationBar
+import com.kirandroid.stumate20.utils.DocumentDialog
+import com.kirandroid.stumate20.utils.SubjectDialog
 import com.kirandroid.stumate20.utils.UserPreferences
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -43,8 +46,27 @@ fun DashboardScreen(navController: NavController) {
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()
     _studentName = studName
 
-    val semList = listOf("Semester","Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8")
-    var selectedSem by rememberSaveable { mutableStateOf(semList[0]) }
+    /*val semList = listOf("Semester","Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8")
+    var selectedSem by rememberSaveable { mutableStateOf(semList[0]) }*/
+
+
+    // For Subject Dialog
+    val showSubjectDialog = remember { mutableStateOf(false) }
+
+    if(showSubjectDialog.value)
+        SubjectDialog(value = "", setShowDialog = { showSubjectDialog.value = it }) {
+            Log.d("DEBUG", "Subject Dialog: $it")
+        }
+
+    // For Upload Document dialog
+    // For Subject Dialog
+    val showDocumentDialog = remember { mutableStateOf(false) }
+
+    if(showDocumentDialog.value)
+        DocumentDialog(value = "", setShowDialog = { showDocumentDialog.value = it }) {
+            Log.d("DEBUG", "Document Dialog: $it")
+        }
+
 
 
     Scaffold(
@@ -114,7 +136,9 @@ fun DashboardScreen(navController: NavController) {
                                 .fillMaxWidth()
                                 .padding(top = 28.dp, start = 15.dp, end = 15.dp)
                                 .clickable {
-                                    /*TODO*/
+                                    // Showing Create Subject Dialog
+                                    showSubjectDialog.value = true
+
                                 }
                                 .height(80.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
@@ -172,7 +196,7 @@ fun DashboardScreen(navController: NavController) {
                                 .fillMaxWidth()
                                 .padding(top = 13.dp, start = 15.dp, bottom = 18.dp, end = 15.dp)
                                 .clickable {
-                                    /*TODO*/
+                                    showDocumentDialog.value = true
                                 }
                                 .height(80.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
@@ -377,7 +401,8 @@ fun DashboardScreen(navController: NavController) {
                     Image(painter = painterResource(id = R.drawable.ending_board),
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxWidth().padding(bottom = 85.dp))
+                            .fillMaxWidth()
+                            .padding(bottom = 85.dp))
                 }
 
             }

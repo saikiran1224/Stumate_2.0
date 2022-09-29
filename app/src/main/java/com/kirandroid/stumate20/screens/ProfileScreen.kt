@@ -40,7 +40,6 @@ fun ProfileScreen(navController: NavController) {
     // Instantiating User Preferences class
     val dataStore = UserPreferences(context = context)
 
-
     // TODO: Need to dynamically load from Shared Preferences
     var studentName by remember { mutableStateOf("") }
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()

@@ -95,3 +95,6 @@ val classMatesIconColor = Color(0xFFFFe6af)
 val navBarBgColor = Color(0xFFEBE4FF)
 val navContentColor = Color(0xFF555555)
 val navIndicatorColor = Color(0x7CC4BADF)
+
+// Subject Dialog
+val unfocusedDialogTextFieldColor = Color(0xFFDED0FF)
