@@ -12,7 +12,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -25,29 +25,95 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kirandroid.stumate20.R
+import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
-import com.kirandroid.stumate20.utils.BottomNavigationBar
-import com.kirandroid.stumate20.utils.DocumentDialog
-import com.kirandroid.stumate20.utils.SubjectDialog
-import com.kirandroid.stumate20.utils.UserPreferences
+import com.kirandroid.stumate20.utils.*
+import com.kirandroid.stumate20.viewmodels.HomeScreenViewModel
+import kotlinx.coroutines.launch
+import javax.security.auth.Subject
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController) {
+fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
+
+    // State from homeScreenViewModel
+    val state by homeScreenViewModel.loadingState.collectAsState()
 
     // Context
     val context = LocalContext.current
     // Instantiating User Preferences class
     val dataStore = UserPreferences(context = context)
 
+    // For Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     // student details
     var _studentName by remember { mutableStateOf("") }
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()
     _studentName = studName
 
+    var _studentBatchID by remember { mutableStateOf("") }
+    val studBatchID = dataStore.getStudentAcademicBatch.collectAsState(initial = "").value.toString()
+    _studentBatchID = studBatchID
+
+    // initialising an empty subjects List
+    var subjectsList = ArrayList<SubjectData>()
+
+
+
     /*val semList = listOf("Semester","Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8")
     var selectedSem by rememberSaveable { mutableStateOf(semList[0]) }*/
+
+    // Showing Snackbar based on the status received from the ViewModel
+    when(state.status) {
+
+        LoadingState.Status.RUNNING -> {
+
+            // show loading progress bar
+
+        }
+
+        LoadingState.Status.SUCCESS -> {
+
+            if(state.homeScreenDocType == "Loaded Subjects") {
+
+                // Since the subjects are loaded successfully, we are now loading the Document dialog
+                // along with passing the list of Subjects retrieved from DB
+                subjectsList = state.subjectsData as ArrayList<SubjectData>
+
+                Log.d("DEBUG", "Here Home Screen: ${state.subjectsData}")
+
+            } else {
+
+                // TODO: Check that SUCCESS is emitted from ether Subject or Document Creation
+
+                // show snackbar based on the submission of the document
+                coroutineScope.launch {
+
+                    when (state.homeScreenDocType) {
+                        "Subject" -> snackbarHostState.showSnackbar("Subject created successfully!")
+                        "Document" -> snackbarHostState.showSnackbar("Document uploaded successfully!")
+                        else -> snackbarHostState.showSnackbar("Some Error Occurred!")
+                    }
+                }
+            }
+        }
+
+        LoadingState.Status.FAILED -> {
+
+            // Show some error occured snackbar
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("${state.msg}")
+            }
+
+        }
+
+        else -> {}
+
+
+    }
 
 
     // For Subject Dialog
@@ -55,17 +121,34 @@ fun DashboardScreen(navController: NavController) {
 
     if(showSubjectDialog.value)
         SubjectDialog(value = "", setShowDialog = { showSubjectDialog.value = it }) {
-            Log.d("DEBUG", "Subject Dialog: $it")
+
+            // Getting the batch ID from datastore and sent to ViewModel
+            // initiate view model here to send data to Database
+            homeScreenViewModel.sendSubjectData(subjectData = it, studentBatchID = _studentBatchID)
+
         }
+
 
     // For Upload Document dialog
-    // For Subject Dialog
     val showDocumentDialog = remember { mutableStateOf(false) }
 
-    if(showDocumentDialog.value)
-        DocumentDialog(value = "", setShowDialog = { showDocumentDialog.value = it }) {
+    if(showDocumentDialog.value) {
+
+        // Since user wants to open document dialog we need to load the subjects
+        homeScreenViewModel.loadSubjectsBasedOnBatchID(_studentBatchID)
+        // if the above returns SUCCESS then the dialog gets opened in LoadingState.Status.SUCCESS
+
+        DocumentDialog(subjectsData = subjectsList, setShowDialog = { showDocumentDialog.value = it }) {
+
+            // Here we will get the data from Document dialog, so we need to call the viewmodel
+            // to upload the file and the document details
+
             Log.d("DEBUG", "Document Dialog: $it")
         }
+
+    }
+
+
 
 
 
@@ -74,6 +157,7 @@ fun DashboardScreen(navController: NavController) {
         topBar = {
                  // NULL
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         content = {
 
             Box(modifier = Modifier

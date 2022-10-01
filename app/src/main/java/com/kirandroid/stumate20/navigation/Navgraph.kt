@@ -12,10 +12,7 @@ import com.kirandroid.stumate20.authentication.LoginScreen
 import com.kirandroid.stumate20.authentication.SignUpScreen
 import com.kirandroid.stumate20.authentication.StudentDetails
 import com.kirandroid.stumate20.screens.*
-import com.kirandroid.stumate20.viewmodels.ChooseAvatarScreenViewModel
-import com.kirandroid.stumate20.viewmodels.LogInScreenViewModel
-import com.kirandroid.stumate20.viewmodels.SignUpScreenViewModel
-import com.kirandroid.stumate20.viewmodels.StudentDetailsViewModel
+import com.kirandroid.stumate20.viewmodels.*
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -109,7 +106,9 @@ fun SetupNavGraph(navController: NavHostController) {
             // Used Earlier
             val studentName = it.arguments?.getString("studName")
 
-            DashboardScreen(navController = navController)
+            val homeScreenViewModel = HomeScreenViewModel()
+
+            DashboardScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
 
         

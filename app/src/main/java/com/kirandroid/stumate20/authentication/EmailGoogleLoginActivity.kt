@@ -130,6 +130,9 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                                 dataStore.setStudentID(studentData.documentID)
                                 dataStore.setStudentName(studentData.name)
                                 dataStore.setStudentEmail(studentData.emailID)
+                                // Setting the student Academic Batch and Gender
+                                dataStore.setStudentGender(studentData.avatarType)
+                                dataStore.setStudentAcademicBatch(studentData.batch_ID)
                             }
 
                             // OF DASHBOARD SCREEN STARTS
@@ -195,6 +198,9 @@ fun LoginScreen(navController: NavController, viewModel: LogInScreenViewModel) {
                                 dataStore.setStudentID(studentData.documentID)
                                 dataStore.setStudentName(studentData.name)
                                 dataStore.setStudentEmail(studentData.emailID)
+                                // Setting the academic batch and Gender
+                                dataStore.setStudentGender(studentData.avatarType)
+                                dataStore.setStudentAcademicBatch(studentData.batch_ID)
                             }
 
                             // OF DASHBOARD SCREEN STARTS

@@ -10,5 +10,6 @@ data class StudentData(
     var deptName: String = "",
     var sectionName: String = "",
     val avatarType: String = "",
-    var documentID: String = ""
+    var documentID: String = "",
+    val batch_ID: String = ""
 )

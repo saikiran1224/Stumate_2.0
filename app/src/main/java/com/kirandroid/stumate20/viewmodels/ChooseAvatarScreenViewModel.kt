@@ -53,8 +53,5 @@ class ChooseAvatarScreenViewModel: ViewModel() {
             Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
             loadingState.emit(LoadingState.error(e.localizedMessage))
         }
-
-
-
     }
 }

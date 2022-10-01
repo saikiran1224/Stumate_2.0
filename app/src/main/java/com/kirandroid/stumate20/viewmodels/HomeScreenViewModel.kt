@@ -1,0 +1,92 @@
+package com.kirandroid.stumate20.viewmodels
+
+import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
+import com.kirandroid.stumate20.data.SubjectData
+import com.kirandroid.stumate20.utils.LoadingState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+
+class HomeScreenViewModel: ViewModel() {
+
+    val loadingState = MutableStateFlow(LoadingState.IDLE)
+
+
+
+
+    fun sendSubjectData(subjectData: SubjectData, studentBatchID: String) = viewModelScope.launch {
+
+        try {
+
+            loadingState.emit(LoadingState.LOADING)
+
+            // Getting the college name from the studentBatchID
+            val collegeName = studentBatchID.split("_").toTypedArray()[1]
+
+            val db = Firebase.firestore
+            // We are creating a sub collection
+            val newSubData = db.collection("subjects_data").document(collegeName).collection(studentBatchID).document()
+            subjectData.documentID = newSubData.id
+
+            newSubData.set(subjectData).await()
+
+            loadingState.emit(LoadingState.success(homeScreenDocType = "Subject"))
+
+        } catch (e: Exception) {
+
+            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+            loadingState.emit(LoadingState.error(e.localizedMessage))
+
+        }
+
+    }
+
+    // Load subjects from DB with help of studentBatchID
+    fun loadSubjectsBasedOnBatchID(studentBatchID: String) = viewModelScope.launch {
+
+        // need to return a list from here
+        try {
+
+            loadingState.emit(LoadingState.LOADING)
+
+            // initialising an empty subjects List
+            val subjectsList: ArrayList<SubjectData> = ArrayList()
+
+            // Getting the college name from the studentBatchID
+            val collegeName = studentBatchID.split("_").toTypedArray()[1]
+
+            val db = Firebase.firestore
+            val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
+            subjectsRef.get().addOnSuccessListener {
+                    // loading all the documents to subjects list
+                    for (doc in it.documents) {
+                        subjectsList.add(doc.toObject<SubjectData>()!!)
+                    }
+                    Log.d("DEBUG", "Data: ${subjectsList.toString()}")
+
+                loadingState.emit(LoadingState.success(homeScreenDocType = "Loaded Subjects", subjectsData = subjectsList ))
+            }
+
+
+        } catch (e: Exception) {
+
+            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+            loadingState.emit(LoadingState.error("Sorry, Unable to load. Please try again!"))
+
+        }
+
+    }
+
+    fun uploadDocumentToDB() = viewModelScope.launch {
+
+        // TODO: This function is for uploading document to Database
+
+    }
+
+}

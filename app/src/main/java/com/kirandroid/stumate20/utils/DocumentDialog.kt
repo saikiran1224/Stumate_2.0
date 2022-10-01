@@ -28,18 +28,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (String) -> Unit) {
+fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) -> Unit, setValue: (String) -> Unit) {
 
     // Form Data
     var txtDocumentName by remember { mutableStateOf(TextFieldValue("")) }
 
     // TODO: Dynamically load the subject names
     // Subjects Drop-down related
-    val subjectsList = listOf("Choose Subject")
+    val subjectsList = listOf<String>("Choose Subject")
+    for (subject in subjectsData!!) {
+        subjectsList.plus(subject.subjectName)
+    }
+
+   // val subjectsList = listOf("Choose Subject", )
     var selectedSubject by rememberSaveable { mutableStateOf(subjectsList[0]) }
 
     // Unit Drop-down related
@@ -156,7 +162,7 @@ fun DocumentDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (S
                                 unfocusedBorderColor = unfocusedDialogTextFieldColor,
                                 placeholderColor = MaterialTheme.colorScheme.secondary,
                                 unfocusedLabelColor = textFieldHintColor,
-                            ),
+                            )
                         )
                         // filter options based on text field value
                         ExposedDropdownMenu(expanded = expanded_2, onDismissRequest = { expanded_2 = false },) {
@@ -181,7 +187,6 @@ fun DocumentDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (S
                             .fillMaxWidth()
                             .padding(bottom = 15.dp, top = 15.dp, start = 5.dp, end = 5.dp)
                             .clickable {
-
                                    // TODO: Whole File upload operation
 
                             },contentAlignment = Alignment.Center){

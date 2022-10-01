@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.kirandroid.stumate20.data.StudentData
+import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.Cabin
 import com.kirandroid.stumate20.ui.theme.textFieldHintColor
 import com.kirandroid.stumate20.ui.theme.txtSubjectsColor
@@ -31,10 +32,10 @@ import com.kirandroid.stumate20.ui.theme.unfocusedDialogTextFieldColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (String) -> Unit) {
+fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (SubjectData) -> Unit) {
 
     // Form Data
-    var txtName by remember { mutableStateOf(TextFieldValue("")) }
+    var txtName by remember { mutableStateOf("") }
 
     // Semester Drop-down related
     val semestersList = listOf("Choose Semester","1st Semester", "2nd Semester", "3rd Semester", "4th Semester",
@@ -133,7 +134,7 @@ fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (St
                     }
 
                     // Unit Drop down
-                    var expanded_2 by remember { mutableStateOf(false) }
+                   /* var expanded_2 by remember { mutableStateOf(false) }
                     ExposedDropdownMenuBox(expanded = expanded_2, onExpandedChange = { expanded_2 = !expanded_2 },
                         modifier = Modifier
                             .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 15.dp)
@@ -164,22 +165,20 @@ fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (St
                                     text = { Text(text = selectionOption, fontSize = 16.sp, fontFamily = Cabin, fontWeight = FontWeight.Normal) })
                             }
                         }
-                    }
+                    }*/
 
                     // Continue Button
                     Button(
                         onClick = {
 
-                            // TODO: Need to create Subject Name
-                            // Need to use the viewModel to perform the Backend process
+                            // Creating a custom SubjectData object and passing it to the `HomeScreen`
+                            val subjectData = SubjectData(subjectName = txtName.toString(),
+                                selectedSem = selectedSemester)
 
-                            if(txtName.toString().isEmpty()) {
-                                // TODO: Notify user to enter something
-                                return@Button
-                            }
+                            // passing the object of subject data
+                            setValue(subjectData)
 
-                            // TODO: Pass all the values from the above data to `setValue`
-                            setValue(txtName.toString())
+                            // Dismissing the dialog
                             setShowDialog(false)
 
                         },
@@ -191,9 +190,9 @@ fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (St
                         shape = CircleShape,
                         elevation = ButtonDefaults.buttonElevation(
                             defaultElevation = 8.dp,
-                            disabledElevation = 2.dp
+                            disabledElevation = 0.dp
                         ), // TODO: Enable the button after doing appropriate validation
-                        enabled = true) {
+                        enabled = (txtName.toString().isNotEmpty()) && (selectedUnit != "Choose Semester")) {
 
                         Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
                     }

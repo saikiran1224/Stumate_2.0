@@ -60,7 +60,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
     // Lists Data
     val batchesList = listOf("Select your Batch","2019 - 2023", "2020 - 2024", "2021 - 2025", "2022 - 2026")
-    val collegeNames = listOf("Select College","GMR Institute of Technology")
+    val collegeNames = listOf("Select College","GMRIT")
     val deptNames = listOf("Select Department","IT", "CSE", "ECE", "EEE", "MECH", "CHEM","CIVIL")
     val sectionNames = listOf("Select Section","A Section", "B Section", "C Section", "Other")
 
@@ -207,7 +207,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
                                modifier = Modifier.fillMaxWidth(), maxLines = 1,
-                               onValueChange = { selectedBatch = it }, label = { Text(text = "Admitted Batch") },
+                               onValueChange = { selectedBatch = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_1) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -242,7 +242,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
                                modifier = Modifier.fillMaxWidth(), maxLines = 1,
-                               onValueChange = { selectedCollege = it }, label = { Text(text = "College Name") },
+                               onValueChange = { selectedCollege = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_2) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -277,7 +277,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
                                modifier = Modifier.fillMaxWidth(), maxLines = 1,
-                               onValueChange = { selectedDepartment = it }, label = { Text(text = "Department") },
+                               onValueChange = { selectedDepartment = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_3) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -312,7 +312,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
                                modifier = Modifier.fillMaxWidth(), maxLines = 1,
-                               onValueChange = { selectedSection = it }, label = { Text(text = "Section") },
+                               onValueChange = { selectedSection = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_4) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -347,6 +347,9 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
 
                              // EMAIL AUTH
 
+                             // Generating the student Unique ID based on college, batch,
+                             val batch_ID = "${selectedBatch}_${selectedCollege}_${selectedDepartment}_${selectedSection}"
+
                              val studentData = StudentData(
                                  name = txtName.text,
                                  emailID = emailID,
@@ -357,6 +360,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                  deptName = selectedDepartment,
                                  sectionName = selectedSection,
                                  avatarType = "Not specified",
+                                 batch_ID = batch_ID
                              )
 
                              viewModel.createUserWithEmailAndPassword(email = emailID, password = password, studentData = studentData)
@@ -365,13 +369,14 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                              // directly proceed to send the details to the Firestore
 
                              // GOOGLE SIGN-IN
-
+                             // Generating the student Unique ID based on college, batch,
+                             val batch_ID = "${selectedBatch}_${selectedCollege}_${selectedDepartment}_${selectedSection}"
                              // once authenticated successfully we need to extract the values from `OutlinedTextField` and
                              // need to send it to Cloud Firestore
                              val studentData = StudentData(name = txtName.text, emailID = googleEmailID.toString(),
                                  authType = authType.toString(), phoneNumber = txtPhone.text,
                                  academicBatch = selectedBatch, collegeName = selectedCollege,
-                                 deptName = selectedDepartment, sectionName = selectedSection, avatarType = "Not specified")
+                                 deptName = selectedDepartment, sectionName = selectedSection, avatarType = "Not specified", batch_ID = batch_ID)
 
                              // passing the Data object to StudentDetailsViewModel for sending Data
                              studentDetailsViewModel.sendStudentDetailsToFirestore(studentData)
@@ -402,12 +407,18 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                        val _studentID by remember { mutableStateOf(state.studentID.toString()) }
                        val _studentEmail by remember { mutableStateOf(state.studentEmailID.toString()) }
 
+                       // Generating the student Unique ID based on college, batch,
+                       val batch_ID = "${selectedBatch}_${selectedCollege}_${selectedDepartment}_${selectedSection}"
+
+
                        // Need to set the app preferences
                        coroutineScope.launch {
                            dataStore.setIsLogin(true)
                            dataStore.setStudentID(_studentID)
                            dataStore.setStudentName(txtName.text.toString())
                            dataStore.setStudentEmail(_studentEmail)
+                           // Setting the student Academic batch
+                           dataStore.setStudentAcademicBatch(batch_ID)
                        }
 
                        // sending user to select Avatar
@@ -434,11 +445,16 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                            val _studentID by remember { mutableStateOf(state.studentID.toString()) }
                            val _studentEmail by remember { mutableStateOf(state.studentEmailID.toString()) }
 
+                           // Generating the student Unique ID based on college, batch,
+                           val batch_ID = "${selectedBatch}_${selectedCollege}_${selectedDepartment}_${selectedSection}"
+
                            coroutineScope.launch {
                                dataStore.setIsLogin(true)
                                dataStore.setStudentID(_studentID)
                                dataStore.setStudentName(txtName.text.toString())
                                dataStore.setStudentEmail(_studentEmail)
+                               // Setting the Student Academic Batch
+                               dataStore.setStudentAcademicBatch(batch_ID)
                            }
 
                            navController.navigate("choose_avatar?stuName=${txtName.text}&stuPhone=${txtPhone.text}")

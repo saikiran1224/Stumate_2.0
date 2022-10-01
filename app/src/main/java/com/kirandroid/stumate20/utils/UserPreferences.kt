@@ -23,6 +23,7 @@ class UserPreferences(private val context: Context) {
         val STUD_ID = stringPreferencesKey("stud_id")
         val STUD_EMAIL_KEY = stringPreferencesKey("stud_email")
         val STUD_GENDER = stringPreferencesKey("stud_gender")
+        val STUD_ACAD_BATCH = stringPreferencesKey("stud_acad_batch")
     }
 
     // Email Getter and Setter
@@ -71,6 +72,18 @@ class UserPreferences(private val context: Context) {
     suspend fun setStudentEmail(studEmailID: String) {
         context.dataStoree.edit { preferences ->
             preferences[STUD_EMAIL_KEY] = studEmailID
+        }
+    }
+
+    // Student Academic Batch Getter and Setter
+    val getStudentAcademicBatch: Flow<String?> = context.dataStoree.data
+        .map { preferences ->
+            preferences[STUD_ACAD_BATCH] ?: "Student Academic Batch"
+        }
+
+    suspend fun setStudentAcademicBatch(studAcadBatch: String) {
+        context.dataStoree.edit { preferences ->
+            preferences[STUD_ACAD_BATCH] = studAcadBatch
         }
     }
 
