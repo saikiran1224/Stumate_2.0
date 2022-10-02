@@ -2,6 +2,7 @@ package com.kirandroid.stumate20.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
@@ -17,7 +18,54 @@ class HomeScreenViewModel: ViewModel() {
 
     val loadingState = MutableStateFlow(LoadingState.IDLE)
 
+    // Creating a LiveData variable
+    var subjects: MutableLiveData<List<SubjectData>> = MutableLiveData<List<SubjectData>>()
 
+    fun listenToSubjects(studentBatchID: String)   {
+
+        try {
+
+          //  loadingState.emit(LoadingState.LOADING)
+            // Getting the college name from the studentBatchID
+            val collegeName = studentBatchID.split("_").toTypedArray()[1]
+
+            val db = Firebase.firestore
+            val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
+
+            subjectsRef.get().addOnSuccessListener {
+
+                // initialising an empty subjects List
+                val subjectsList = ArrayList<SubjectData>()
+
+                // loading all the documents to subjects list
+                // below code block executes only when the `QuerySnapshot` is not null
+                it?.let {
+                    // iterating over all the documents
+                    for (doc in it.documents) {
+                            doc.toObject<SubjectData>()?.let { subject ->
+                                // adding document which is not null
+                                subjectsList.add(subject)
+                            }
+                    }
+
+                    // passing the above retrieved subjects into LiveData object
+                    subjects.value = subjectsList
+
+                    Log.d("DEBUG", "In ViewModel: ${subjects.value}")
+                }
+
+            }
+
+          //  loadingState.emit(LoadingState.success())
+
+        } catch (e: Exception) {
+
+            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+           // loadingState.emit(LoadingState.error("Sorry, Unable to load. Please try again!"))
+
+        }
+
+    }
 
 
     fun sendSubjectData(subjectData: SubjectData, studentBatchID: String) = viewModelScope.launch {
@@ -47,7 +95,7 @@ class HomeScreenViewModel: ViewModel() {
 
     }
 
-    // Load subjects from DB with help of studentBatchID
+    /*// Load subjects from DB with help of studentBatchID
     fun loadSubjectsBasedOnBatchID(studentBatchID: String) = viewModelScope.launch {
 
         // need to return a list from here
@@ -63,15 +111,18 @@ class HomeScreenViewModel: ViewModel() {
 
             val db = Firebase.firestore
             val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
+
             subjectsRef.get().addOnSuccessListener {
                     // loading all the documents to subjects list
                     for (doc in it.documents) {
                         subjectsList.add(doc.toObject<SubjectData>()!!)
                     }
-                    Log.d("DEBUG", "Data: ${subjectsList.toString()}")
 
-                loadingState.emit(LoadingState.success(homeScreenDocType = "Loaded Subjects", subjectsData = subjectsList ))
-            }
+                    sendSubjectsList(subjectsList = subjectsList)
+
+                    Log.d("DEBUG", "Data: ${subjectsList.toString()}")
+            }.await()
+
 
 
         } catch (e: Exception) {
@@ -82,6 +133,12 @@ class HomeScreenViewModel: ViewModel() {
         }
 
     }
+
+    private fun sendSubjectsList(subjectsList: List<SubjectData>) = viewModelScope.launch {
+
+        loadingState.emit(LoadingState.success(homeScreenDocType = "Loaded Subjects", subjectsData = subjectsList ))
+
+    }*/
 
     fun uploadDocumentToDB() = viewModelScope.launch {
 

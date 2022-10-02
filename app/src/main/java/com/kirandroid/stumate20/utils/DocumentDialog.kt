@@ -1,5 +1,6 @@
 package com.kirandroid.stumate20.utils
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,13 +41,19 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
 
     // TODO: Dynamically load the subject names
     // Subjects Drop-down related
-    val subjectsList = listOf<String>("Choose Subject")
+    val subjectNames = ArrayList<String>()
+
+   // subjectNames.clear()
+  //  subjectNames.add("Choose Subject")
     for (subject in subjectsData!!) {
-        subjectsList.plus(subject.subjectName)
+        subjectNames.add(subject.subjectName)
     }
 
+
+    Log.d("DEBUG", "In Document Dialog $subjectsData")
+
    // val subjectsList = listOf("Choose Subject", )
-    var selectedSubject by rememberSaveable { mutableStateOf(subjectsList[0]) }
+    var selectedSubject by rememberSaveable { mutableStateOf(subjectNames[0]) }
 
     // Unit Drop-down related
     val unitsList = listOf("Choose Unit","Unit - 1", "Unit - 2", "Unit - 3", "Unit - 4")
@@ -132,7 +139,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                         )
                         // filter options based on text field value
                         ExposedDropdownMenu(expanded = expanded_1, onDismissRequest = { expanded_1 = false },) {
-                            subjectsList.forEach { selectionOption ->
+                            subjectNames.forEach { selectionOption ->
                                 DropdownMenuItem(
                                     onClick = { selectedSubject = selectionOption
                                         expanded_1 = false

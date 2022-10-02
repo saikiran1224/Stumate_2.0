@@ -12,6 +12,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -23,27 +24,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 import com.kirandroid.stumate20.R
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 import com.kirandroid.stumate20.utils.*
 import com.kirandroid.stumate20.viewmodels.HomeScreenViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.security.auth.Subject
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
+    "MutableCollectionMutableState"
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
-
-    // State from homeScreenViewModel
-    val state by homeScreenViewModel.loadingState.collectAsState()
+fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel = viewModel()) {
 
     // Context
     val context = LocalContext.current
     // Instantiating User Preferences class
     val dataStore = UserPreferences(context = context)
+
+    var _studentBatchID by remember { mutableStateOf("") }
+    val studBatchID = dataStore.getStudentAcademicBatch.collectAsState(initial = "").value.toString()
+    _studentBatchID = studBatchID
+
+
+    // calling the method to listen to subjects
+    homeScreenViewModel.listenToSubjects(_studentBatchID)
+
+    // Listening to subjects from ViewModel
+    val subjects by homeScreenViewModel.subjects.observeAsState(initial = emptyList())
+
+
+    // State from homeScreenViewModel
+    val state by homeScreenViewModel.loadingState.collectAsState()
+
+
 
     // For Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
@@ -54,78 +76,78 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()
     _studentName = studName
 
-    var _studentBatchID by remember { mutableStateOf("") }
-    val studBatchID = dataStore.getStudentAcademicBatch.collectAsState(initial = "").value.toString()
-    _studentBatchID = studBatchID
 
+
+   /* // Loading all the subjects from the Database and storing it into the Datastore
+    // This will gets called everytime when this composable is called
+    // Getting the college name from the studentBatchID
+    val collegeName = _studentBatchID.split("_").toTypedArray()[1]
     // initialising an empty subjects List
-    var subjectsList = ArrayList<SubjectData>()
+    val subjectsList by remember { mutableStateOf(ArrayList<SubjectData>()) }
 
+    val db = Firebase.firestore
+    val subjectsRef = db.collection("subjects_data").document(collegeName).collection(_studentBatchID)
 
+    subjectsRef.get().addOnSuccessListener {
 
-    /*val semList = listOf("Semester","Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8")
-    var selectedSem by rememberSaveable { mutableStateOf(semList[0]) }*/
+        // loading all the documents to subjects list
+        for (doc in it.documents) {
+            subjectsList.add(doc.toObject<SubjectData>()!!)
+        }
+
+        // setting the subjectsList into Datastore
+        coroutineScope.launch {
+            dataStore.setStudentGender("Hi")
+        }
+
+        Log.d("DEBUG", "Data: ${subjectsList.toString()}")
+    }*/
+
 
     // Showing Snackbar based on the status received from the ViewModel
     when(state.status) {
 
         LoadingState.Status.RUNNING -> {
-
             // show loading progress bar
-
         }
 
         LoadingState.Status.SUCCESS -> {
-
-            if(state.homeScreenDocType == "Loaded Subjects") {
-
-                // Since the subjects are loaded successfully, we are now loading the Document dialog
-                // along with passing the list of Subjects retrieved from DB
-                subjectsList = state.subjectsData as ArrayList<SubjectData>
-
-                Log.d("DEBUG", "Here Home Screen: ${state.subjectsData}")
-
-            } else {
-
                 // TODO: Check that SUCCESS is emitted from ether Subject or Document Creation
+                if(state.homeScreenDocType == "Loaded Subjects") {
 
-                // show snackbar based on the submission of the document
-                coroutineScope.launch {
+                    Log.d("DEBUG", state.subjectsData.toString())
 
-                    when (state.homeScreenDocType) {
-                        "Subject" -> snackbarHostState.showSnackbar("Subject created successfully!")
-                        "Document" -> snackbarHostState.showSnackbar("Document uploaded successfully!")
-                        else -> snackbarHostState.showSnackbar("Some Error Occurred!")
+                } else {
+
+                   // show snackbar based on the submission of the document
+                    coroutineScope.launch {
+
+                        when (state.homeScreenDocType) {
+                            "Subject" -> snackbarHostState.showSnackbar("Subject created successfully!")
+                            "Document" -> snackbarHostState.showSnackbar("Document uploaded successfully!")
+                            else -> snackbarHostState.showSnackbar("Some Error Occurred!")
+                        }
                     }
-                }
-            }
+               }
         }
 
         LoadingState.Status.FAILED -> {
-
             // Show some error occured snackbar
             coroutineScope.launch {
                 snackbarHostState.showSnackbar("${state.msg}")
             }
-
         }
 
         else -> {}
-
-
     }
-
 
     // For Subject Dialog
     val showSubjectDialog = remember { mutableStateOf(false) }
-
     if(showSubjectDialog.value)
         SubjectDialog(value = "", setShowDialog = { showSubjectDialog.value = it }) {
-
             // Getting the batch ID from datastore and sent to ViewModel
             // initiate view model here to send data to Database
             homeScreenViewModel.sendSubjectData(subjectData = it, studentBatchID = _studentBatchID)
-
         }
 
 
@@ -134,11 +156,13 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 
     if(showDocumentDialog.value) {
 
-        // Since user wants to open document dialog we need to load the subjects
-        homeScreenViewModel.loadSubjectsBasedOnBatchID(_studentBatchID)
-        // if the above returns SUCCESS then the dialog gets opened in LoadingState.Status.SUCCESS
 
-        DocumentDialog(subjectsData = subjectsList, setShowDialog = { showDocumentDialog.value = it }) {
+
+        // Since user wants to open document dialog we need to load the subjects
+
+        Log.d("DEBUG", "Home Screen: ${subjects.toString()}")
+
+        DocumentDialog(subjectsData = subjects, setShowDialog = { showDocumentDialog.value = it }) {
 
             // Here we will get the data from Document dialog, so we need to call the viewmodel
             // to upload the file and the document details
@@ -146,11 +170,8 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
             Log.d("DEBUG", "Document Dialog: $it")
         }
 
+
     }
-
-
-
-
 
     Scaffold(
 
@@ -493,6 +514,12 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
         },
         bottomBar = { BottomNavigationBar(navController = navController, "Home") }
     )
+}
+
+@Composable
+fun ShowDialogWithSubjects(retrievedsubjectsList: List<SubjectData>, showDocumentDialogValue: Boolean) {
 
 
 }
+
+

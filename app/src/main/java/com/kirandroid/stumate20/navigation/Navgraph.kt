@@ -1,6 +1,7 @@
 package com.kirandroid.stumate20.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -106,7 +107,7 @@ fun SetupNavGraph(navController: NavHostController) {
             // Used Earlier
             val studentName = it.arguments?.getString("studName")
 
-            val homeScreenViewModel = HomeScreenViewModel()
+            val homeScreenViewModel: HomeScreenViewModel = viewModel()
 
             DashboardScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
