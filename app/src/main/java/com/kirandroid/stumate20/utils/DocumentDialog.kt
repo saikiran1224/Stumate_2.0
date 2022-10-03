@@ -127,7 +127,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                 fontWeight = FontWeight.W300, fontSize = 15.sp),
                             singleLine = true, shape = RoundedCornerShape(80.dp),
-                            modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                            modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                             onValueChange = { selectedSubject = it }, label = {  },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_1) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -161,7 +161,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                 fontWeight = FontWeight.W300, fontSize = 15.sp),
                             singleLine = true, shape = RoundedCornerShape(80.dp),
-                            modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                            modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                             onValueChange = { selectedUnit = it }, label = { },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_2) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(

@@ -206,7 +206,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
-                               modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                               modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                                onValueChange = { selectedBatch = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_1) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -241,7 +241,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
-                               modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                               modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                                onValueChange = { selectedCollege = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_2) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -276,7 +276,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
-                               modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                               modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                                onValueChange = { selectedDepartment = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_3) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -311,7 +311,7 @@ fun StudentDetails(navController: NavController, authType: String?, googleEmailI
                                textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                    fontWeight = FontWeight.W300, fontSize = 15.sp),
                                singleLine = true, shape = RoundedCornerShape(80.dp),
-                               modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                               modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                                onValueChange = { selectedSection = it }, label = {  },
                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_4) },
                                colors = TextFieldDefaults.outlinedTextFieldColors(

@@ -111,7 +111,7 @@ fun SubjectDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Su
                             textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                 fontWeight = FontWeight.W300, fontSize = 15.sp),
                             singleLine = true, shape = RoundedCornerShape(80.dp),
-                            modifier = Modifier.fillMaxWidth(), maxLines = 1,
+                            modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
                             onValueChange = { selectedSemester = it }, label = {  },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_1) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(

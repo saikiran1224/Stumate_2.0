@@ -95,51 +95,6 @@ class HomeScreenViewModel: ViewModel() {
 
     }
 
-    /*// Load subjects from DB with help of studentBatchID
-    fun loadSubjectsBasedOnBatchID(studentBatchID: String) = viewModelScope.launch {
-
-        // need to return a list from here
-        try {
-
-            loadingState.emit(LoadingState.LOADING)
-
-            // initialising an empty subjects List
-            val subjectsList: ArrayList<SubjectData> = ArrayList()
-
-            // Getting the college name from the studentBatchID
-            val collegeName = studentBatchID.split("_").toTypedArray()[1]
-
-            val db = Firebase.firestore
-            val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
-
-            subjectsRef.get().addOnSuccessListener {
-                    // loading all the documents to subjects list
-                    for (doc in it.documents) {
-                        subjectsList.add(doc.toObject<SubjectData>()!!)
-                    }
-
-                    sendSubjectsList(subjectsList = subjectsList)
-
-                    Log.d("DEBUG", "Data: ${subjectsList.toString()}")
-            }.await()
-
-
-
-        } catch (e: Exception) {
-
-            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
-            loadingState.emit(LoadingState.error("Sorry, Unable to load. Please try again!"))
-
-        }
-
-    }
-
-    private fun sendSubjectsList(subjectsList: List<SubjectData>) = viewModelScope.launch {
-
-        loadingState.emit(LoadingState.success(homeScreenDocType = "Loaded Subjects", subjectsData = subjectsList ))
-
-    }*/
-
     fun uploadDocumentToDB() = viewModelScope.launch {
 
         // TODO: This function is for uploading document to Database
