@@ -54,18 +54,8 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
     val studBatchID = dataStore.getStudentAcademicBatch.collectAsState(initial = "").value.toString()
     _studentBatchID = studBatchID
 
-
-    // calling the method to listen to subjects
-    homeScreenViewModel.listenToSubjects(_studentBatchID)
-
-    // Listening to subjects from ViewModel
-    val subjects by homeScreenViewModel.subjects.observeAsState(initial = emptyList())
-
-
     // State from homeScreenViewModel
     val state by homeScreenViewModel.loadingState.collectAsState()
-
-
 
     // For Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
@@ -76,34 +66,6 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()
     _studentName = studName
 
-
-
-   /* // Loading all the subjects from the Database and storing it into the Datastore
-    // This will gets called everytime when this composable is called
-    // Getting the college name from the studentBatchID
-    val collegeName = _studentBatchID.split("_").toTypedArray()[1]
-    // initialising an empty subjects List
-    val subjectsList by remember { mutableStateOf(ArrayList<SubjectData>()) }
-
-    val db = Firebase.firestore
-    val subjectsRef = db.collection("subjects_data").document(collegeName).collection(_studentBatchID)
-
-    subjectsRef.get().addOnSuccessListener {
-
-        // loading all the documents to subjects list
-        for (doc in it.documents) {
-            subjectsList.add(doc.toObject<SubjectData>()!!)
-        }
-
-        // setting the subjectsList into Datastore
-        coroutineScope.launch {
-            dataStore.setStudentGender("Hi")
-        }
-
-        Log.d("DEBUG", "Data: ${subjectsList.toString()}")
-    }*/
-
-
     // Showing Snackbar based on the status received from the ViewModel
     when(state.status) {
 
@@ -112,14 +74,10 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
         }
 
         LoadingState.Status.SUCCESS -> {
-                // TODO: Check that SUCCESS is emitted from ether Subject or Document Creation
-                if(state.homeScreenDocType == "Loaded Subjects") {
 
-                    Log.d("DEBUG", state.subjectsData.toString())
-
-                } else {
-
-                   // show snackbar based on the submission of the document
+               // show snackbar based on the submission of the document
+               // make sures executes only one time
+                LaunchedEffect(Unit) {
                     coroutineScope.launch {
 
                         when (state.homeScreenDocType) {
@@ -128,7 +86,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                             else -> snackbarHostState.showSnackbar("Some Error Occurred!")
                         }
                     }
-               }
+                }
         }
 
         LoadingState.Status.FAILED -> {
@@ -151,23 +109,28 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
         }
 
 
+    // calling the method to listen to subjects
+    homeScreenViewModel.listenToSubjects(_studentBatchID)
+
+    // Listening to subjects from ViewModel
+    val subjects by homeScreenViewModel.subjects.observeAsState(initial = emptyList())
+
     // For Upload Document dialog
     val showDocumentDialog = remember { mutableStateOf(false) }
 
     if(showDocumentDialog.value) {
 
-
-
         // Since user wants to open document dialog we need to load the subjects
 
-        Log.d("DEBUG", "Home Screen: ${subjects.toString()}")
-
         DocumentDialog(subjectsData = subjects, setShowDialog = { showDocumentDialog.value = it }) {
-
             // Here we will get the data from Document dialog, so we need to call the viewmodel
             // to upload the file and the document details
 
-            Log.d("DEBUG", "Document Dialog: $it")
+            // Passing the documentData to ViewModel to upload the file to storage and subsequently to send data to
+            // Cloud Firestore
+            homeScreenViewModel.uploadDocumentToCloudStorage(documentData = it, studentBatchID = _studentBatchID)
+
+            Log.d("DEBUG", "Document Dialog: ${it}")
         }
 
 

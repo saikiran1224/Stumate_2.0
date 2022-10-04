@@ -8,11 +8,29 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import com.kirandroid.stumate20.data.DocumentData
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.utils.LoadingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+/*
+
+Overall Schema
+==============
+College Name -> Batch ID -> { subjects_data, documents_data }
+
+
+Schema for Subjects
+=================
+(subjects_data -> docID -> Data)
+
+
+Schema for Documents
+===================
+(documents_data -> Sub Name -> Unit Name -> file)*/
 
 class HomeScreenViewModel: ViewModel() {
 
@@ -30,7 +48,8 @@ class HomeScreenViewModel: ViewModel() {
             val collegeName = studentBatchID.split("_").toTypedArray()[1]
 
             val db = Firebase.firestore
-            val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
+            // val subjectsRef = db.collection("subjects_data").document(collegeName).collection(studentBatchID)
+            val subjectsRef = db.collection(collegeName).document(studentBatchID).collection("subjects_data")
 
             subjectsRef.get().addOnSuccessListener {
 
@@ -67,7 +86,6 @@ class HomeScreenViewModel: ViewModel() {
 
     }
 
-
     fun sendSubjectData(subjectData: SubjectData, studentBatchID: String) = viewModelScope.launch {
 
         try {
@@ -79,7 +97,8 @@ class HomeScreenViewModel: ViewModel() {
 
             val db = Firebase.firestore
             // We are creating a sub collection
-            val newSubData = db.collection("subjects_data").document(collegeName).collection(studentBatchID).document()
+           // val newSubData = db.collection("subject_and_docs_data").document(collegeName).collection(studentBatchID).document()
+           val newSubData = db.collection(collegeName).document(studentBatchID).collection("subjects_data").document()
             subjectData.documentID = newSubData.id
 
             newSubData.set(subjectData).await()
@@ -88,16 +107,63 @@ class HomeScreenViewModel: ViewModel() {
 
         } catch (e: Exception) {
 
-            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+            Log.d("DEBUG", "Failure occurred in Sending Subject Data ${e.localizedMessage!!.toString()}")
             loadingState.emit(LoadingState.error(e.localizedMessage))
 
         }
-
     }
 
-    fun uploadDocumentToDB() = viewModelScope.launch {
+    fun uploadDocumentToCloudStorage(documentData: DocumentData, studentBatchID: String) = viewModelScope.launch {
 
-        // TODO: This function is for uploading document to Database
+        // This function is for uploading document to Database
+        // Here we need to perform two steps
+        // Step 1: First we need to upload the file to Cloud Storage and obtain the `downloadUrl`
+        // Step 2: Using the downloadUrl we need to send DocumentData to Firestore
+
+        try {
+
+            loadingState.emit(LoadingState.LOADING)
+
+            // Implementation of Step 1 as follows
+            val storage = Firebase.storage
+            val documentDownloadUrl =
+                documentData.documentUri?.let {
+                    storage.reference.child(studentBatchID).child(documentData.subjectName).child(documentData.documentName)
+                        .putFile(it).await()
+                }?.storage?.downloadUrl?.await()
+            // Step - 1 Process Completed Obtained the corresponding file`s Download URL
+
+            // Implementation of Step 2 as follows
+
+            if(documentDownloadUrl.toString().isNotEmpty()) {
+                // Getting the college name from the studentBatchID
+                val collegeName = studentBatchID.split("_").toTypedArray()[1]
+                val db = Firebase.firestore
+                // We are creating a sub collection
+                val newDocData =
+                    db.collection(collegeName).document(studentBatchID).collection("documents_data")
+                        .document(documentData.subjectName).collection(documentData.unitName)
+                        .document()
+
+                documentData.documentDownloadUrl = documentDownloadUrl.toString()
+                documentData.docID = newDocData.id
+
+                newDocData.set(documentData).await()
+
+                Log.d("DEBUG", "Download Url for file: $documentDownloadUrl")
+
+                loadingState.emit(LoadingState.success(homeScreenDocType = "Document"))
+            }
+
+
+        } catch (e: Exception) {
+            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+            loadingState.emit(LoadingState.error(e.localizedMessage))
+        }
+
+
+
+
 
     }
 

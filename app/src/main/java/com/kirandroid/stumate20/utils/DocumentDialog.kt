@@ -1,6 +1,10 @@
 package com.kirandroid.stumate20.utils
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,26 +33,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.kirandroid.stumate20.data.DocumentData
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) -> Unit, setValue: (String) -> Unit) {
+fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) -> Unit, setValue: (DocumentData) -> Unit) {
+
+    // Creating a object of DocumentData
+    val documentData = DocumentData()
 
     // Form Data
     var txtDocumentName by remember { mutableStateOf(TextFieldValue("")) }
 
+    var uploadBoxDesc by remember { mutableStateOf("Browse your Files to Upload") }
+
     // TODO: Dynamically load the subject names
     // Subjects Drop-down related
     val subjectNames = ArrayList<String>()
-
+    subjectNames.add("Choose Subject")
    // subjectNames.clear()
   //  subjectNames.add("Choose Subject")
-    for (subject in subjectsData!!) {
-        subjectNames.add(subject.subjectName)
+    if (subjectsData != null) {
+        for (subject in subjectsData) {
+            subjectNames.add(subject.subjectName)
+        }
     }
-
 
     Log.d("DEBUG", "In Document Dialog $subjectsData")
 
@@ -59,6 +70,37 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
     val unitsList = listOf("Choose Unit","Unit - 1", "Unit - 2", "Unit - 3", "Unit - 4")
     var selectedUnit by rememberSaveable { mutableStateOf(unitsList[0]) }
 
+    var isDocumentSelected by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    // custom class of GetContent: input string has multiple mime types divided by ";"
+    // Here multiple mime type are divided and stored in array to pass to putExtra.
+    // super.createIntent creates ordinary intent, then add the extra.
+    class GetDocumentsWithMultipleTypes:ActivityResultContracts.GetContent() {
+        override fun createIntent(context: Context, input:String): Intent {
+            val inputArray = input.split(",").toTypedArray()
+            val myIntent = super.createIntent(context, input)
+            myIntent.putExtra(Intent.EXTRA_MIME_TYPES, inputArray)
+            return myIntent
+        }
+    }
+
+    val documentsLauncher =  rememberLauncherForActivityResult(GetDocumentsWithMultipleTypes()) { docUri ->
+        docUri?.let {
+          // Once user selects the file, update that file is selected
+            isDocumentSelected = true
+
+         // Intimating user that file selected
+            uploadBoxDesc = docUri.path.toString()
+
+         // Updating the Uri of the DocumentData object here
+            documentData.documentUri = docUri
+
+        }
+    }
+
+
     Dialog(onDismissRequest = { setShowDialog(false) }) {
 
         Surface(shape = RoundedCornerShape(16.dp), color = Color.White) {
@@ -68,6 +110,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
 
                 Column(modifier = Modifier.padding(20.dp)) {
 
+                    // Close Icon
                     Icon(imageVector = Icons.Outlined.Cancel, contentDescription = null,
                         tint = txtSubjectsColor,
                         modifier = Modifier
@@ -77,6 +120,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             }
                             .align(Alignment.End))
 
+                    // Upload Document Text
                     Text(text = "Upload Document",
                         fontSize = 29.sp,
                         fontWeight = FontWeight.Medium,
@@ -85,14 +129,14 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             .padding(top = 0.dp),
                         color = MaterialTheme.colorScheme.primary)
 
+                    // Caption for Upload Document
                     Text(text = "Add your documents in chapter-wise for more info",
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 10.dp)
                             .align(Alignment.CenterHorizontally), textAlign = TextAlign.Center)
-
-
+                    
                     // Document Name
                     OutlinedTextField(modifier = Modifier
                         .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 15.dp)
@@ -127,7 +171,9 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                 fontWeight = FontWeight.W300, fontSize = 15.sp),
                             singleLine = true, shape = RoundedCornerShape(80.dp),
-                            modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(), maxLines = 1,
                             onValueChange = { selectedSubject = it }, label = {  },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_1) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -161,7 +207,9 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             textStyle = TextStyle(color = textFieldHintColor, fontFamily = Cabin,
                                 fontWeight = FontWeight.W300, fontSize = 15.sp),
                             singleLine = true, shape = RoundedCornerShape(80.dp),
-                            modifier = Modifier.fillMaxWidth().menuAnchor(), maxLines = 1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(), maxLines = 1,
                             onValueChange = { selectedUnit = it }, label = { },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded_2) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -194,7 +242,9 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             .fillMaxWidth()
                             .padding(bottom = 15.dp, top = 15.dp, start = 5.dp, end = 5.dp)
                             .clickable {
-                                   // TODO: Whole File upload operation
+                                // TODO: Whole File upload operation
+                                // When user click here, we need to open the file directory
+                                documentsLauncher.launch("application/*,image/*")
 
                             },contentAlignment = Alignment.Center){
                         Canvas(modifier = Modifier
@@ -207,7 +257,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             .align(Alignment.Center), horizontalArrangement = Arrangement.Center) {
                             Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null,
                                 modifier = Modifier.padding(end = 12.dp), tint = MaterialTheme.colorScheme.primary)
-                            Text(textAlign = TextAlign.Center,text = "Browse your Files to Upload",
+                            Text(textAlign = TextAlign.Center,text = uploadBoxDesc,
                                 color = MaterialTheme.colorScheme.primary, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
 
                         }
@@ -226,7 +276,14 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             }
 
                             // TODO: Pass all the values from the above data to `setValue`
-                            setValue(txtDocumentName.toString())
+
+                            documentData.documentName = txtDocumentName.text.toString()
+                            documentData.subjectName = selectedSubject.toString()
+                            documentData.unitName = selectedUnit.toString()
+
+                            // Passing the documentData object to HomeScreen
+                            setValue(documentData)
+
                             setShowDialog(false)
 
                         },
@@ -238,9 +295,11 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                         shape = CircleShape,
                         elevation = ButtonDefaults.buttonElevation(
                             defaultElevation = 8.dp,
-                            disabledElevation = 2.dp
+                            disabledElevation = 0.dp
                         ), // TODO: Enable the button after doing appropriate validation
-                        enabled = true) {
+                        enabled = ((txtDocumentName.text.toString().isNotBlank() && selectedSubject != "Choose Subject") &&
+                                (selectedUnit != "Choose Unit") && isDocumentSelected)
+                    ) {
 
                         Text(text = "Upload", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
                     }
