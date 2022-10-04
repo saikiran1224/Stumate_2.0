@@ -4,6 +4,11 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -15,9 +20,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -347,26 +354,18 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                     OutlinedCard( modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 15.dp)
                         .fillMaxWidth(),
+
                         border = BorderStroke(width = 0.5.dp, color = MaterialTheme.colorScheme.secondary),
                         colors = CardDefaults.cardColors(
                             containerColor = dashboardBgColor
                         )) {
 
-                        // Image and Text
-                        Image(painter = painterResource(id = R.drawable.subjects_icon),
-                            modifier = Modifier
-                                .padding(top = 11.dp)
-                                .align(CenterHorizontally),
-                            contentDescription = null)
-
-                        Text(text = "Browse your Subjects",
-                            modifier = Modifier
-                                .padding(top = 2.dp, bottom = 25.dp)
-                                .align(CenterHorizontally),
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.W500,
-                            color = txtBrowseYourSubs
-                        )
+                        // Show Browse your Subjects if there are no subjects
+                        // else showing list of subjects
+                        if (subjects.isNotEmpty())
+                            ShowListOfSubjects(subjects = subjects)
+                        else
+                            ShowBrowseYourSubjects()
 
                     }
 
@@ -375,7 +374,6 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                         color = txtSubjectsColor,
                         fontWeight = FontWeight.W700,
                         modifier = Modifier.padding(top = 25.dp, start = 16.dp))
-
 
                     // Community Card
                     OutlinedCard(modifier = Modifier
@@ -480,9 +478,85 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 }
 
 @Composable
-fun ShowDialogWithSubjects(retrievedsubjectsList: List<SubjectData>, showDocumentDialogValue: Boolean) {
+fun ShowListOfSubjects(subjects: List<SubjectData>) {
 
 
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentSize(Center)) {
+
+        // Three individual columns of Subjects [ Subject Circle, Name of Subject ]
+
+        val colors = listOf(Color(0xFFffd294), Color(0xFFb699ff), Color(0xFFff9090))
+
+        LazyRow(contentPadding = PaddingValues(start = 15.dp, end = 20.dp, top = 15.dp, bottom = 10.dp), ) {
+
+         items(subjects.take(3)) {
+                LazySubjectCard(subjectData = it, borderColor = colors.random())
+            }
+        }
+
+        // Show More Button
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 25.dp, end = 25.dp, bottom = 15.dp, top = 0.dp).wrapContentSize(
+                    Center).clickable {
+                    // TODO: Open Subjects Screen
+                },
+            colors = CardDefaults.cardColors(
+                containerColor = unfocusedDialogTextFieldColor
+            ),
+            shape = RoundedCornerShape(21.dp)
+        ) {
+
+            Row(modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Center)) {
+
+                // Show More Text
+                Text(text = "Show More", color = MaterialTheme.colorScheme.primary,
+                fontSize = 15.sp, modifier = Modifier
+                        .padding(top = 5.dp, bottom = 5.dp), textAlign = TextAlign.Center)
+
+
+
+            }
+
+        }
+
+    }
+
+
+
+}
+
+@Composable
+fun ShowBrowseYourSubjects() {
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentSize(Center)) {
+
+        Image(
+            painter = painterResource(id = R.drawable.subjects_icon),
+            modifier = Modifier
+                .padding(top = 11.dp)
+                .align(CenterHorizontally),
+            contentDescription = null
+        )
+
+        Text(
+            text = "Browse your Subjects",
+            modifier = Modifier
+                .padding(top = 2.dp, bottom = 25.dp)
+                .align(CenterHorizontally),
+            fontSize = 17.sp,
+            fontWeight = FontWeight.W500,
+            color = txtBrowseYourSubs
+        )
+
+    }
 }
 
 
