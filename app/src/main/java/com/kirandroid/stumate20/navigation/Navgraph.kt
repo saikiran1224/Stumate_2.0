@@ -112,6 +112,17 @@ fun SetupNavGraph(navController: NavHostController) {
             DashboardScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
 
+        // Note: Passing an empty list as far as Navgraph considered
+        composable(route = Screen.AllSubjectsScreen.route) {
+
+            val homeScreenViewModel: HomeScreenViewModel = viewModel()
+
+            AllSubjectsScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
+
+        }
+
+
+
         
     }
     

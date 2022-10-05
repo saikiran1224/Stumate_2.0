@@ -98,3 +98,5 @@ val navIndicatorColor = Color(0x7CC4BADF)
 
 // Subject Dialog
 val unfocusedDialogTextFieldColor = Color(0xFFDED0FF)
+
+val unFocusedChipContainerColor = Color(0xFFc7b2ff)

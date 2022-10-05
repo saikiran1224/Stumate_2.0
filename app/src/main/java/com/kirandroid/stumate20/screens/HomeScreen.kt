@@ -164,6 +164,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                             .background(dashboardTopBgColor)
                             .height(140.dp)
                             .fillMaxWidth())
+
                         Card(
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(20.dp),
@@ -363,7 +364,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                         // Show Browse your Subjects if there are no subjects
                         // else showing list of subjects
                         if (subjects.isNotEmpty())
-                            ShowListOfSubjects(subjects = subjects)
+                            ShowListOfSubjects(subjects = subjects, navController = navController)
                         else
                             ShowBrowseYourSubjects()
 
@@ -478,8 +479,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 }
 
 @Composable
-fun ShowListOfSubjects(subjects: List<SubjectData>) {
-
+fun ShowListOfSubjects(subjects: List<SubjectData>, navController: NavController) {
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -489,6 +489,7 @@ fun ShowListOfSubjects(subjects: List<SubjectData>) {
 
         val colors = listOf(Color(0xFFffd294), Color(0xFFb699ff), Color(0xFFff9090))
 
+        // Horizontal Recycler View
         LazyRow(contentPadding = PaddingValues(start = 15.dp, end = 20.dp, top = 15.dp, bottom = 10.dp), ) {
 
          items(subjects.take(3)) {
@@ -503,6 +504,8 @@ fun ShowListOfSubjects(subjects: List<SubjectData>) {
                 .padding(start = 25.dp, end = 25.dp, bottom = 15.dp, top = 0.dp).wrapContentSize(
                     Center).clickable {
                     // TODO: Open Subjects Screen
+                    navController.navigate("all_subjects_screen")
+
                 },
             colors = CardDefaults.cardColors(
                 containerColor = unfocusedDialogTextFieldColor
@@ -519,6 +522,13 @@ fun ShowListOfSubjects(subjects: List<SubjectData>) {
                 fontSize = 15.sp, modifier = Modifier
                         .padding(top = 5.dp, bottom = 5.dp), textAlign = TextAlign.Center)
 
+                Icon(
+                    imageVector = Icons.Outlined.ExpandMore,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(start = 0.dp, top = 5.5.dp, bottom = 5.dp)
+                )
 
 
             }
