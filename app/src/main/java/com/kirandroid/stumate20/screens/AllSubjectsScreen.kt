@@ -238,7 +238,6 @@ fun AllSubjectsScreen(navController: NavController, homeScreenViewModel: HomeScr
 
                             }
 
-
                             // 4th Year
                             Card(
                                 modifier = Modifier
@@ -355,7 +354,7 @@ fun AllSubjectsScreen(navController: NavController, homeScreenViewModel: HomeScr
 
                             ) {
                                 items(subjects.size) { index ->
-                                    LazySubjectCard(subjectData = subjects[index], borderColor = colors.random())
+                                    LazySubjectCard(subjectData = subjects[index], borderColor = colors.random(), navController = navController)
                                 }
                             }
 

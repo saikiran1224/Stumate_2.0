@@ -121,6 +121,15 @@ fun SetupNavGraph(navController: NavHostController) {
 
         }
 
+        composable(route = Screen.SubjectInfoScreen.route + "/{subName}") {
+
+            // TODO: Need to pass Subject View Model
+            val subjectName = it.arguments?.getString("subName")
+
+            SubjectInfoScreen(navController = navController, subjectName = subjectName.toString())
+
+        }
+
 
 
         

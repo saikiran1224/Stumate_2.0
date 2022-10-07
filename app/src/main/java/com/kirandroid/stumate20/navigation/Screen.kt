@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     // Subjects Related
     object AllSubjectsScreen: Screen("all_subjects_screen")
     object ShowListOfSubjects: Screen("show_subjects_home_screen")
+    object SubjectInfoScreen: Screen("subject_info_screen")
 
 
 }

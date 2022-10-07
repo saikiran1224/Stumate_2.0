@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.light_onprimary
 import com.kirandroid.stumate20.ui.theme.primary
@@ -36,7 +37,7 @@ import com.kirandroid.stumate20.ui.theme.unfocusedDialogTextFieldColor
 
 @Composable
 // TODO: Add Subject Data as parameter over here
-fun LazySubjectCard(subjectData: SubjectData, borderColor: Color) {
+fun LazySubjectCard(navController: NavController, subjectData: SubjectData, borderColor: Color) {
 
     // Creating an object to store Container Color
     var containerColor: Color? = null
@@ -55,6 +56,7 @@ fun LazySubjectCard(subjectData: SubjectData, borderColor: Color) {
     Column(modifier = Modifier
         .clickable {
             // TODO: Open the subject Info screen with Subject Name
+            navController.navigate("subject_info_screen/${subjectData.subjectName}")
         }
         .width(100.dp)
         .padding(start = 11.dp, end = 10.dp, top = 8.dp, bottom = 8.dp)) {

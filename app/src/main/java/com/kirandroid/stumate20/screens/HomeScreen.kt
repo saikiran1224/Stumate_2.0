@@ -493,7 +493,7 @@ fun ShowListOfSubjects(subjects: List<SubjectData>, navController: NavController
         LazyRow(contentPadding = PaddingValues(start = 15.dp, end = 20.dp, top = 15.dp, bottom = 10.dp), ) {
 
          items(subjects.take(3)) {
-                LazySubjectCard(subjectData = it, borderColor = colors.random())
+                LazySubjectCard(subjectData = it, borderColor = colors.random(), navController = navController)
             }
         }
 

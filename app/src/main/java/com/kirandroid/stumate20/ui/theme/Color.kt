@@ -100,3 +100,10 @@ val navIndicatorColor = Color(0x7CC4BADF)
 val unfocusedDialogTextFieldColor = Color(0xFFDED0FF)
 
 val unFocusedChipContainerColor = Color(0xFFc7b2ff)
+
+// Unit Info Screen
+val redContainerColor = Color(0xFFffbcb2)
+val greenContainerColor = Color(0xFFABFFA9)
+val violetContainerColor = Color(0xFFE2D6FF)
+val yellowContainerColor = Color(0xFFFFE4B6)
+val unitTextColor = Color(0xFF414141)
