@@ -158,6 +158,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 
                 Column(modifier = Modifier.fillMaxSize()) {
 
+                    // Box for Create Subject and Documents Buttons
                     Box(modifier = Modifier.fillMaxWidth()) {
 
                         Box(modifier = Modifier
@@ -351,11 +352,10 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                         }
                     }
 
-                    // Browse Subjects here and Image Column
+                    // Outlined Card - Browse Subjects here and Image Column
                     OutlinedCard( modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 15.dp)
                         .fillMaxWidth(),
-
                         border = BorderStroke(width = 0.5.dp, color = MaterialTheme.colorScheme.secondary),
                         colors = CardDefaults.cardColors(
                             containerColor = dashboardBgColor

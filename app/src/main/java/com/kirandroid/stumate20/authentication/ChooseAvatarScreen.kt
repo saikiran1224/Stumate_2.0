@@ -161,6 +161,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
 
                             // Male
                             Column(modifier = Modifier.padding(end = 30.dp), verticalArrangement = Arrangement.Center) {
+
                                 IconToggleButton(checked = maleCheckedState.value, onCheckedChange = {
                                     maleCheckedState.value = !maleCheckedState.value
                                   //  maleBorderColor.value = seed
@@ -279,7 +280,7 @@ fun ChooseAvatarScreen(navController: NavController, studentName: String?, phone
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 8.dp,
                         disabledElevation = 0.dp
-                    ), // TODO: Enable the button after doing appropriate validation
+                    ), // Enable the button after doing appropriate validation
                     enabled = maleCheckedState.value || femaleCheckedState.value) {
 
                     Text(text = "Continue", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
