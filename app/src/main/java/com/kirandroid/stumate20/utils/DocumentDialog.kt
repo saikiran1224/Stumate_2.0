@@ -95,7 +95,7 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
             uploadBoxDesc = docUri.path.toString()
 
          // Updating the Uri of the DocumentData object here
-            documentData.documentUri = docUri
+            documentData.documentUri = docUri.toString()
 
         }
     }

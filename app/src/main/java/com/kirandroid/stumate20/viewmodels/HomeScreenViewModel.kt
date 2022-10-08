@@ -2,6 +2,7 @@ package com.kirandroid.stumate20.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,11 +40,11 @@ class HomeScreenViewModel: ViewModel() {
     // Creating a LiveData variable
     var subjects: MutableLiveData<List<SubjectData>> = MutableLiveData<List<SubjectData>>()
 
-    fun listenToSubjects(studentBatchID: String)   {
+    fun listenToSubjects(studentBatchID: String) = viewModelScope.launch  {
 
         try {
 
-          //  loadingState.emit(LoadingState.LOADING)
+           loadingState.emit(LoadingState.LOADING)
             // Getting the college name from the studentBatchID
             val collegeName = studentBatchID.split("_").toTypedArray()[1]
 
@@ -75,11 +76,11 @@ class HomeScreenViewModel: ViewModel() {
 
             }
 
-          //  loadingState.emit(LoadingState.success())
+          // loadingState.emit(LoadingState.success(homeScreenDocType = "Loading Subs"))
 
         } catch (e: Exception) {
 
-            Log.d("DEBUG", "Failure occurred in Choose Avatar ${e.localizedMessage!!.toString()}")
+            Log.d("DEBUG", "Failure occurred in Listening Subjects ${e.localizedMessage!!.toString()}")
            // loadingState.emit(LoadingState.error("Sorry, Unable to load. Please try again!"))
 
         }
@@ -129,7 +130,7 @@ class HomeScreenViewModel: ViewModel() {
             val documentDownloadUrl =
                 documentData.documentUri?.let {
                     storage.reference.child(studentBatchID).child(documentData.subjectName).child(documentData.documentName)
-                        .putFile(it).await()
+                        .putFile(it.toUri()).await()
                 }?.storage?.downloadUrl?.await()
             // Step - 1 Process Completed Obtained the corresponding file`s Download URL
 

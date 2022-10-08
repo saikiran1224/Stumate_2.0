@@ -43,9 +43,6 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {
-            // Null
-        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = {
 
@@ -96,17 +93,16 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                     color = txtSubjectsColor,
                         fontWeight = FontWeight.Medium, fontSize = 19.sp)
 
-
                     // Row for creating two cards Unit - 1 and Unit - 2
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 18.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) {
 
                         // First Card
                         Card(modifier = Modifier
                             .size(190.dp, 63.dp)
                             .padding(start = 18.dp, end = 14.dp).clickable {
-                                       // Pass Subject Name and Unit name
+                                       // Pass Subject Name and Unit name to DisplayDocuments Screen
+                                        val unitName = "Unit - 1"
+                                       navController.navigate("display_documents_screen?subName=$subjectName&unitName=$unitName")
                             },
                              shape = RoundedCornerShape(15.dp),
                             colors = CardDefaults.cardColors(
@@ -145,6 +141,8 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                             .size(180.dp, 63.dp)
                             .padding(end = 16.dp).clickable {
                                         // Pass Sub Name and Unit Name
+                                val unitName = "Unit - 2"
+                                navController.navigate("display_documents_screen?subName=$subjectName&unitName=$unitName")
                             },
                             shape = RoundedCornerShape(15.dp),
                             colors = CardDefaults.cardColors(
@@ -181,15 +179,15 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                     }
 
                     // Row for creating two cards Unit - 3 and Unit - 4
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(top = 20.dp)) {
 
                         // First Card
                         Card(modifier = Modifier
                             .size(190.dp, 63.dp)
                             .padding(start = 18.dp, end = 14.dp).clickable {
                                            // Pass Sub Name and Unit name
+                                val unitName = "Unit - 3"
+                                navController.navigate("display_documents_screen?subName=$subjectName&unitName=$unitName")
                             },
                             shape = RoundedCornerShape(15.dp),
                             colors = CardDefaults.cardColors(
@@ -215,12 +213,7 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                                         .padding(top = 0.dp, end = 20.dp)
                                         .size(17.dp)
                                 )
-
-
-
                             }
-
-
                         }
 
                         // Second Card
@@ -228,6 +221,8 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                             .size(180.dp, 63.dp)
                             .padding(end = 16.dp).clickable {
                                         // Pass Sub Name and Unit Name
+                                val unitName = "Unit - 4"
+                                navController.navigate("display_documents_screen?subName=$subjectName&unitName=$unitName")
                             },
                             shape = RoundedCornerShape(15.dp),
                             colors = CardDefaults.cardColors(
@@ -252,14 +247,8 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                                         .padding(top = 0.dp, end = 20.dp)
                                         .size(17.dp)
                                 )
-
-
-
                             }
-
-
                         }
-
                     }
 
                     // Quote Text
@@ -279,12 +268,8 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth().padding(top = 50.dp))
-
-
                 }
             )
-
-
         }
     )
 

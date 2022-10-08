@@ -1,6 +1,7 @@
 package com.kirandroid.stumate20.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -100,6 +101,31 @@ fun SetupNavGraph(navController: NavHostController) {
             val chooseAvatarScreenViewModel: ChooseAvatarScreenViewModel = ChooseAvatarScreenViewModel()
 
             ChooseAvatarScreen(navController = navController, studentName = studentName, phone = phone, viewModel = chooseAvatarScreenViewModel)
+        }
+
+        composable(route = Screen.DisplayDocumentsScreen.route + "?subName={subName}&unitName={unitName}", arguments = listOf(
+
+            navArgument("subName") {
+                defaultValue = null
+                nullable = true
+                type = NavType.StringType
+            },
+            navArgument("unitName") {
+                defaultValue = null
+                nullable = true
+                type = NavType.StringType
+            }
+
+        )) {
+
+            val subjectName = it.arguments?.getString("subName")
+            val unitName = it.arguments?.getString("unitName")
+
+            val documentsViewModel: DocumentsViewModel = viewModel()
+
+            DisplayDocumentsScreen(navController = navController, subjectName = subjectName.toString(),
+                unitName = unitName.toString(), documentsViewModel = documentsViewModel)
+
         }
 
         composable(route = Screen.HomeScreen.route) {

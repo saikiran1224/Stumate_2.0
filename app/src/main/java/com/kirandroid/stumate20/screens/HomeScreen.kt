@@ -90,6 +90,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                         when (state.homeScreenDocType) {
                             "Subject" -> snackbarHostState.showSnackbar("Subject created successfully!")
                             "Document" -> snackbarHostState.showSnackbar("Document uploaded successfully!")
+                            "Loading Subs" -> {}
                             else -> snackbarHostState.showSnackbar("Some Error Occurred!")
                         }
                     }
@@ -98,6 +99,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 
         LoadingState.Status.FAILED -> {
             // Show some error occured snackbar
+
             coroutineScope.launch {
                 snackbarHostState.showSnackbar("${state.msg}")
             }

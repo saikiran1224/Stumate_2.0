@@ -8,5 +8,9 @@ data class DocumentData (
     var unitName: String = "",
     var docID: String = "",
     var documentDownloadUrl: String = "",
-    var documentUri: Uri? = null
+    var documentUri: String? = null,
+
+    // TODO: Need to update the fields in Database
+    var submittedBy: String = "",
+    var timeStamp:String = ""
 )

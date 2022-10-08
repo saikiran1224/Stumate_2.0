@@ -107,3 +107,7 @@ val greenContainerColor = Color(0xFFABFFA9)
 val violetContainerColor = Color(0xFFE2D6FF)
 val yellowContainerColor = Color(0xFFFFE4B6)
 val unitTextColor = Color(0xFF414141)
+
+val yellowBgDocumentsScreen = Color(0xFFFBE8CE)
+
+val documentCircleBgColor = Color(0xFFE6DCFF)
