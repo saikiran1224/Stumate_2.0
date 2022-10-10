@@ -19,6 +19,9 @@ import com.kirandroid.stumate20.viewmodels.*
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
 
+    val homeScreenViewModel: HomeScreenViewModel = viewModel()
+    val documentsViewModel: DocumentsViewModel = viewModel()
+
     NavHost(
         navController = navController, 
         startDestination = Screen.Splash.route) {
@@ -121,7 +124,6 @@ fun SetupNavGraph(navController: NavHostController) {
             val subjectName = it.arguments?.getString("subName")
             val unitName = it.arguments?.getString("unitName")
 
-            val documentsViewModel: DocumentsViewModel = viewModel()
 
             DisplayDocumentsScreen(navController = navController, subjectName = subjectName.toString(),
                 unitName = unitName.toString(), documentsViewModel = documentsViewModel)
@@ -133,15 +135,12 @@ fun SetupNavGraph(navController: NavHostController) {
             // Used Earlier
             val studentName = it.arguments?.getString("studName")
 
-            val homeScreenViewModel: HomeScreenViewModel = viewModel()
-
             DashboardScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
         }
 
         // Note: Passing an empty list as far as Navgraph considered
         composable(route = Screen.AllSubjectsScreen.route) {
 
-            val homeScreenViewModel: HomeScreenViewModel = viewModel()
 
             AllSubjectsScreen(navController = navController, homeScreenViewModel = homeScreenViewModel)
 

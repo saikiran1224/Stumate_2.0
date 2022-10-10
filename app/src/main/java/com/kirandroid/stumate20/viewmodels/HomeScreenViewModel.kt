@@ -71,7 +71,7 @@ class HomeScreenViewModel: ViewModel() {
                     // passing the above retrieved subjects into LiveData object
                     subjects.value = subjectsList
 
-                    Log.d("DEBUG", "In ViewModel: ${subjects.value}")
+                   // Log.d("DEBUG", "Loaded Subjects in ViewModel: ${subjects.value}")
                 }
 
             }
