@@ -111,6 +111,10 @@ dependencies {
 
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
+    // Chrome Custom Tabs
+    implementation 'androidx.browser:browser:1.4.0'
+
+
 
 }
 

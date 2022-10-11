@@ -9,6 +9,7 @@ data class DocumentData (
     var docID: String = "",
     var documentDownloadUrl: String = "",
     var documentUri: String? = null,
+    var documentContentType: String? = null,
 
     // TODO: Need to update the fields in Database
     var submittedBy: String = "",

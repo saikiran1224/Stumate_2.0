@@ -471,7 +471,7 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 85.dp))
+                            .padding(bottom = 80.dp))
                 }
 
             }

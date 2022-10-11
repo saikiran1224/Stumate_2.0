@@ -1,8 +1,10 @@
 package com.kirandroid.stumate20.utils
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -25,6 +27,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,9 +40,12 @@ import com.kirandroid.stumate20.data.DocumentData
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) -> Unit, setValue: (DocumentData) -> Unit) {
+
+    val context = LocalContext.current
 
     // Creating a object of DocumentData
     val documentData = DocumentData()
@@ -90,6 +96,13 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
         docUri?.let {
           // Once user selects the file, update that file is selected
             isDocumentSelected = true
+
+            val cR: ContentResolver = context.contentResolver
+            val mime = MimeTypeMap.getSingleton()
+            val type = cR.getType(docUri)
+
+            // Setting the file type
+            documentData.documentContentType = type
 
          // Intimating user that file selected
             uploadBoxDesc = docUri.path.toString()
@@ -184,7 +197,9 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             ),
                         )
                         // filter options based on text field value
-                        ExposedDropdownMenu(expanded = expanded_1, onDismissRequest = { expanded_1 = false },) {
+                        ExposedDropdownMenu(
+                            expanded = expanded_1,
+                            onDismissRequest = { expanded_1 = false }) {
                             subjectNames.forEach { selectionOption ->
                                 DropdownMenuItem(
                                     onClick = { selectedSubject = selectionOption
@@ -220,7 +235,9 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                             )
                         )
                         // filter options based on text field value
-                        ExposedDropdownMenu(expanded = expanded_2, onDismissRequest = { expanded_2 = false },) {
+                        ExposedDropdownMenu(
+                            expanded = expanded_2,
+                            onDismissRequest = { expanded_2 = false }) {
                             unitsList.forEach { selectionOption ->
                                 DropdownMenuItem(
                                     onClick = { selectedUnit = selectionOption
@@ -301,7 +318,12 @@ fun DocumentDialog(subjectsData: List<SubjectData>?, setShowDialog: (Boolean) ->
                                 (selectedUnit != "Choose Unit") && isDocumentSelected)
                     ) {
 
-                        Text(text = "Upload", textAlign = TextAlign.Center,fontFamily = Cabin, fontSize = 18.sp, )
+                        Text(
+                            text = "Upload",
+                            textAlign = TextAlign.Center,
+                            fontFamily = Cabin,
+                            fontSize = 18.sp
+                        )
                     }
 
 
