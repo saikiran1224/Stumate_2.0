@@ -43,10 +43,12 @@ import com.kirandroid.stumate20.utils.*
 import com.kirandroid.stumate20.viewmodels.HomeScreenViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.security.auth.Subject
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
-    "MutableCollectionMutableState"
+    "MutableCollectionMutableState", "SimpleDateFormat"
 )
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +74,9 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
     var _studentName by remember { mutableStateOf("") }
     val studName = dataStore.getStudentName.collectAsState(initial = "").value.toString()
     _studentName = studName
+
+    // For Time Stamp
+    val currentTimeStamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Date())
 
     // Showing Snackbar based on the status received from the ViewModel
     when(state.status) {
@@ -114,6 +119,12 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
         SubjectDialog(value = "", setShowDialog = { showSubjectDialog.value = it }) {
             // Getting the batch ID from datastore and sent to ViewModel
             // initiate view model here to send data to Database
+
+            // Setting some additional parameters like Timestamp and Submitted by
+
+            it.timeStamp = currentTimeStamp.toString()
+            it.submittedBy = _studentName.toString()
+
             homeScreenViewModel.sendSubjectData(subjectData = it, studentBatchID = _studentBatchID)
         }
 
@@ -137,6 +148,11 @@ fun DashboardScreen(navController: NavController, homeScreenViewModel: HomeScree
 
             // Passing the documentData to ViewModel to upload the file to storage and subsequently to send data to
             // Cloud Firestore
+
+            // Setting paramters like TimeStamp and Submitted By
+            it.timeStamp = currentTimeStamp.toString()
+            it.submittedBy = _studentName.toString()
+
             homeScreenViewModel.uploadDocumentToCloudStorage(documentData = it, studentBatchID = _studentBatchID)
 
             Log.d("DEBUG", "Document Dialog: ${it}")

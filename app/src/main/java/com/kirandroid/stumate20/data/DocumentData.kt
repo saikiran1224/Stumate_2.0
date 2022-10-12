@@ -10,8 +10,7 @@ data class DocumentData (
     var documentDownloadUrl: String = "",
     var documentUri: String? = null,
     var documentContentType: String? = null,
-
-    // TODO: Need to update the fields in Database
     var submittedBy: String = "",
-    var timeStamp:String = ""
+    var timeStamp:String = "",
+    var reportedCount: Int = 0
 )

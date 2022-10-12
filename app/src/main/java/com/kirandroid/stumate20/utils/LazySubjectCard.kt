@@ -93,7 +93,7 @@ fun LazySubjectCard(navController: NavController, subjectData: SubjectData, bord
         )
 
         Text(text = subjectData.subjectName.toString(),
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .padding(top = 10.dp)

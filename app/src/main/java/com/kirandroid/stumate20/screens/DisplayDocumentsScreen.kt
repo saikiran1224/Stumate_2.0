@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,16 +28,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.kirandroid.stumate20.R
+import com.kirandroid.stumate20.data.DocumentData
+import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 import com.kirandroid.stumate20.utils.LazyDocumentCard
 import com.kirandroid.stumate20.utils.UserPreferences
 import com.kirandroid.stumate20.viewmodels.DocumentsViewModel
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +69,7 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
     // Listening to subjects from ViewModel
     val documents by documentsViewModel.documents.observeAsState(initial = emptyList())
 
-    var searchText by remember { mutableStateOf("") }
+    val searchText = remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -70,14 +77,14 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
             
             Column(modifier = Modifier
                 .padding(it)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             content = {
 
                 Box(modifier = Modifier
                     .background(yellowBgDocumentsScreen)
                     .height(190.dp)
                     .fillMaxWidth()) {
-
                     Column(
                         content = {
 
@@ -85,7 +92,8 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
                             Row(modifier = Modifier.fillMaxWidth()) {
 
                                 // Back Icon
-                                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(top = 10.dp, end = 10.dp)) {
+                                IconButton(onClick = { navController.popBackStack() },
+                                    modifier = Modifier.padding(top = 10.dp, end = 10.dp)) {
                                     Icon(imageVector = Icons.Filled.ArrowBack ,
                                         contentDescription = "Back Icon",
                                         tint = unfocusedAvatarColor,
@@ -106,14 +114,15 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
                                 .size(300.dp, 56.dp)
                                 .align(CenterHorizontally)
                                 .padding(top = 0.dp, bottom = 0.dp),
-                                value = searchText,
+                                value = searchText.value,
                                 shape = RoundedCornerShape(80.dp),
                                 singleLine = true,
                                 leadingIcon = {
-                                          Icon(imageVector = Icons.Filled.Search, tint = MaterialTheme.colorScheme.primary,contentDescription = "",)
+                                          Icon(imageVector = Icons.Filled.Search, tint = MaterialTheme.colorScheme.primary,contentDescription = "",
+                                              modifier = Modifier.padding(top = 4.dp, start = 8.dp))
                                 },
                                 onValueChange = { newText ->
-                                    searchText = newText
+                                    searchText.value = newText
                                 },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -125,7 +134,7 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
                                     textColor = unfocusedAvatarColor
                                 ),
                                 placeholder = { Text(text = "Search your Documents")})
-                            
+
                         })
                 }
 
@@ -148,12 +157,8 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
                 // Checking whether documents list is not Empty
                 if (documents.isNotEmpty()) {
 
-                    // Displaying list of documents retrieved from the Database
-                    LazyColumn(contentPadding = PaddingValues(top = 10.dp)) {
-                        items(documents.size) { index ->
-                            LazyDocumentCard(documentData = documents[index], navController = navController)
-                        }
-                    }
+                    DisplayDocumentsList(documents = documents,
+                        searchText = searchText, navController = navController)
 
                 }
                 Log.d("DEBUG", "Display Documents Screen: ${documents.toString()}")
@@ -187,4 +192,50 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
     ) 
     
     
+}
+
+@Composable
+fun DisplayDocumentsList(documents: List<DocumentData>, searchText: MutableState<TextFieldValue>, navController: NavController) {
+
+    Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+
+        ConstraintLayout(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            // Displaying list of documents retrieved from the Database
+
+            // Creating an empty Documents List to store the searched ones
+            var filteredDocumentsList: List<DocumentData>
+
+            // Final result list once the text is entered
+           // val resultList = remember { mutableStateListOf<DocumentData>() }
+
+            LazyColumn(
+                contentPadding = PaddingValues(top = 10.dp),
+                modifier = Modifier.fillMaxWidth().height(300.dp)
+            ) {
+
+                // Logic for searching Documents
+                val searchedText = searchText.value.text
+                filteredDocumentsList = if (searchedText.isEmpty()) {
+                    documents
+                } else {
+                    val resultList = ArrayList<DocumentData>()
+                    for (document in documents) {
+                        if (document.documentName.lowercase(Locale.getDefault()).contains(searchedText.lowercase(Locale.getDefault()))) {
+                            resultList.add(document)
+                        }
+                    }
+                    resultList
+
+                }
+
+                items(filteredDocumentsList) { filteredDocument ->
+                    LazyDocumentCard(
+                        documentData = filteredDocument,
+                        navController = navController
+                    )
+                }
+            }
+        }
+    }
+
 }

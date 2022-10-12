@@ -11,13 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.shape
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -36,40 +33,57 @@ fun LazyDocumentCard(documentData: DocumentData, navController: NavController) {
 
     val context = LocalContext.current
 
+    // For options purpose
+    var menuExpanded by remember { mutableStateOf(false) }
+
     OutlinedCard(
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 18.dp)
-            .fillMaxWidth().clickable {
+            .fillMaxWidth()
+            .clickable {
 
-                      // Checking the content type of the file
-                      // If its of PDF, then we are going to create a chooser, else opening the custom tab
-                      if (documentData.documentContentType?.contains("image") == true)
-                          // Open the URL in the browser or from the app using Chrome Custom Tabs
-                          ChromeCustomTab(context = context, URL = documentData.documentDownloadUrl)
-                      else {
+                // Checking the content type of the file
+                // If its of PDF, then we are going to create a chooser, else opening the custom tab
+                if (documentData.documentContentType?.contains("image") == true)
+                // Open the URL in the browser or from the app using Chrome Custom Tabs
+                    ChromeCustomTab(context = context, URL = documentData.documentDownloadUrl)
+                else {
 
-                          // Creating a chooser where user can choose the PDF viewer
-                          val intent = Intent(Intent.ACTION_VIEW)
-                          // If the file type is PDF we are directly opening with PDF Viewer
-                          if (documentData.documentContentType == "application/pdf")
-                            intent.setDataAndType(Uri.parse(documentData.documentDownloadUrl), "application/pdf")
-                          else
-                            intent.setDataAndType(Uri.parse(documentData.documentDownloadUrl), "application/*")
 
-                          // Setting the flag
-                          intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    // Creating a chooser where user can choose the PDF viewer
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    // If the file type is PDF we are directly opening with PDF Viewer
+                    if (documentData.documentContentType == "application/pdf")
+                        intent.setDataAndType(
+                            Uri.parse(documentData.documentDownloadUrl),
+                            "application/pdf"
+                        )
+                    else
+                        intent.setDataAndType(
+                            Uri.parse(documentData.documentDownloadUrl),
+                            "application/*"
+                        )
 
-                          // Creating an new intent
-                          // Creating an Intent
-                          val newIntent = Intent.createChooser(intent, "Open File")
-                          try {
-                              context.startActivity(newIntent)
-                          } catch (e: ActivityNotFoundException) {
-                              // Instruct the user to install a PDF reader here, or something
-                              Toast.makeText(context, "Sorry, Your mobile doesn't have any supported app to open this file", Toast.LENGTH_LONG).show()
-                          }
+                    // Setting the flag
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-                      }
+                    // Creating an new intent
+                    // Creating an Intent
+                    val newIntent = Intent.createChooser(intent, "Open File")
+                    try {
+                        context.startActivity(newIntent)
+                    } catch (e: ActivityNotFoundException) {
+                        // Instruct the user to install a PDF reader here, or something
+                        Toast
+                            .makeText(
+                                context,
+                                "Sorry, Your mobile doesn't have any supported app to open this file",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                    }
+
+                }
 
             },
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.secondary),
@@ -92,8 +106,10 @@ fun LazyDocumentCard(documentData: DocumentData, navController: NavController) {
                         .padding(end = 25.dp)
                         .size(26.dp)
                         .drawBehind {
-                                drawCircle(color = documentCircleBgColor,
-                                radius = this.size.maxDimension)
+                            drawCircle(
+                                color = documentCircleBgColor,
+                                radius = this.size.maxDimension
+                            )
                         },
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -106,14 +122,46 @@ fun LazyDocumentCard(documentData: DocumentData, navController: NavController) {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp).clickable {
-                                  // TODO: Open the options menu where you want to show download and mark as inappropriate option
-                    },
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                Box() {
+
+                    Icon(
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clickable {
+                                // Open the options menu where you want to show download and mark as inappropriate option
+                                menuExpanded = true
+                            },
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = { /* TODO: Handle delete! */ },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.Delete,
+                                    contentDescription = null
+                                )
+                            })
+                        DropdownMenuItem(
+                            text = { Text("Report") },
+                            onClick = { /* Handle settings! */ },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.Report,
+                                    contentDescription = null
+                                )
+                            })
+                    }
+                }
+
+
 
             }
 

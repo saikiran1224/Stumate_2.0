@@ -67,7 +67,7 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                         Column(modifier = Modifier.fillMaxWidth()) {
 
                             // Back Icon
-                            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(top = 10.dp)) {
+                            IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.padding(top = 10.dp)) {
                                 Icon(imageVector = Icons.Filled.ArrowBack ,
                                     contentDescription = "Back Icon",
                                     tint = unfocusedAvatarColor,
@@ -88,13 +88,13 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
 
                     // Your Units Text
                     Text(text = "Your Units",
-                    modifier = Modifier.padding(top = 26.dp, start = 20.dp, bottom = 0.dp),
+                    modifier = Modifier.padding(top = 35.dp, start = 20.dp, bottom = 0.dp),
                         textAlign = TextAlign.Start,
                     color = txtSubjectsColor,
                         fontWeight = FontWeight.Medium, fontSize = 19.sp)
 
                     // Row for creating two cards Unit - 1 and Unit - 2
-                    Row(modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(top = 27.dp)) {
 
                         // First Card
                         Card(modifier = Modifier
@@ -267,7 +267,7 @@ fun SubjectInfoScreen(navController: NavController, subjectName: String) {
                     Image(painter = painterResource(id = R.drawable.ending_board),
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxWidth().padding(top = 50.dp))
+                            .padding(top = 80.dp).fillMaxWidth().height(150.dp))
                 }
             )
         }
