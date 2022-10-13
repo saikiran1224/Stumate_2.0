@@ -1,5 +1,6 @@
 package com.kirandroid.stumate20.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,10 +42,13 @@ import com.kirandroid.stumate20.data.DocumentData
 import com.kirandroid.stumate20.data.SubjectData
 import com.kirandroid.stumate20.ui.theme.*
 import com.kirandroid.stumate20.utils.LazyDocumentCard
+import com.kirandroid.stumate20.utils.LoadingState
 import com.kirandroid.stumate20.utils.UserPreferences
 import com.kirandroid.stumate20.viewmodels.DocumentsViewModel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DisplayDocumentsScreen(navController: NavController, subjectName: String, unitName: String, documentsViewModel: DocumentsViewModel = viewModel()) {
@@ -58,6 +62,9 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    // State from homeScreenViewModel
+    val state by documentsViewModel.loadingState.collectAsState()
+
     var _studentBatchID by remember { mutableStateOf("") }
     val studBatchID = dataStore.getStudentAcademicBatch.collectAsState(initial = "").value.toString()
     _studentBatchID = studBatchID
@@ -70,6 +77,41 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
     val documents by documentsViewModel.documents.observeAsState(initial = emptyList())
 
     val searchText = remember { mutableStateOf(TextFieldValue("")) }
+
+
+
+    // Showing Snackbar based on the status received from the ViewModel
+    when(state.status) {
+
+        LoadingState.Status.RUNNING -> {
+            // show loading progress bar
+        }
+
+        LoadingState.Status.SUCCESS -> {
+
+            // show snackbar based on the submission of the document
+            // make sures executes only one time
+            LaunchedEffect(Unit) {
+                coroutineScope.launch {
+
+                    when (state.homeScreenDocType) {
+                        "Document Deleted" -> snackbarHostState.showSnackbar("Document Deleted successfully!")
+
+                    }
+                }
+            }
+        }
+
+        LoadingState.Status.FAILED -> {
+            // Show some error occured snackbar
+
+            coroutineScope.launch {
+               // snackbarHostState.showSnackbar("${state.msg}")
+            }
+        }
+
+        else -> {}
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -158,7 +200,8 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
                 if (documents.isNotEmpty()) {
 
                     DisplayDocumentsList(documents = documents,
-                        searchText = searchText, navController = navController)
+                        searchText = searchText, navController = navController,
+                        documentsViewModel = documentsViewModel, studentBatchID = _studentBatchID, subjectName = subjectName, unitName = unitName)
 
                 }
                 Log.d("DEBUG", "Display Documents Screen: ${documents.toString()}")
@@ -195,7 +238,8 @@ fun DisplayDocumentsScreen(navController: NavController, subjectName: String, un
 }
 
 @Composable
-fun DisplayDocumentsList(documents: List<DocumentData>, searchText: MutableState<TextFieldValue>, navController: NavController) {
+fun DisplayDocumentsList(documents: List<DocumentData>, subjectName: String, unitName: String,
+                         studentBatchID: String,searchText: MutableState<TextFieldValue>, navController: NavController, documentsViewModel: DocumentsViewModel) {
 
     Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
 
@@ -225,13 +269,16 @@ fun DisplayDocumentsList(documents: List<DocumentData>, searchText: MutableState
                         }
                     }
                     resultList
-
                 }
 
                 items(filteredDocumentsList) { filteredDocument ->
                     LazyDocumentCard(
                         documentData = filteredDocument,
-                        navController = navController
+                        navController = navController,
+                        documentsViewModel = documentsViewModel,
+                        studentBatchID = studentBatchID,
+                        subjectName = subjectName,
+                        unitName = unitName
                     )
                 }
             }

@@ -27,9 +27,11 @@ import androidx.navigation.NavController
 import com.kirandroid.stumate20.data.DocumentData
 import com.kirandroid.stumate20.ui.theme.dashboardBgColor
 import com.kirandroid.stumate20.ui.theme.documentCircleBgColor
+import com.kirandroid.stumate20.viewmodels.DocumentsViewModel
 
 @Composable
-fun LazyDocumentCard(documentData: DocumentData, navController: NavController) {
+fun LazyDocumentCard(documentData: DocumentData, navController: NavController,
+                     documentsViewModel: DocumentsViewModel, studentBatchID: String, subjectName: String, unitName: String) {
 
     val context = LocalContext.current
 
@@ -142,7 +144,13 @@ fun LazyDocumentCard(documentData: DocumentData, navController: NavController) {
                     ) {
                         DropdownMenuItem(
                             text = { Text("Delete") },
-                            onClick = { /* TODO: Handle delete! */ },
+                            onClick = {
+                                  documentsViewModel.deleteDocument(documentData = documentData,
+                                      studentBatchID = studentBatchID, subjectName = subjectName, unitName = unitName)
+
+                                // Hiding the menu
+                                menuExpanded = false
+                            },
                             leadingIcon = {
                                 Icon(
                                     Icons.Outlined.Delete,
